@@ -2,7 +2,7 @@ import ee
 
 ee.Initialize(project="rhetorica-464606")
 
-def tree_cover_dynamic_world(min_lon, min_lat, max_lon, max_lat,
+def get_tree_coverage(min_lon, min_lat, max_lon, max_lat,
                              start_date="2024-01-01",
                              end_date="2024-12-31"):
 
@@ -51,13 +51,11 @@ def tree_cover_dynamic_world(min_lon, min_lat, max_lon, max_lat,
         "date_range": f"{start_date} to {end_date}"
     }
 
+# stats = get_tree_coverage(
+#     -73.9819,
+#     40.7642,
+#     -73.9498,
+#     40.8007
+# )
 
-# Example: Central Park NYC
-stats = tree_cover_dynamic_world(
-    -73.9819,
-    40.7642,
-    -73.9498,
-    40.8007
-)
-
-print(stats)
+# print(stats)

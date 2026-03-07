@@ -116,11 +116,10 @@ def get_us_demographics(latitude, longitude):
         print(f"Error fetching demographic data: {e}")
         return None
 
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Tysons, VA (Intersection of Rt 7 & Rt 123)
-    test_lat = 38.9187
-    test_lon = -77.2311
+# if __name__ == "__main__":
+#     # Tysons, VA (Intersection of Rt 7 & Rt 123)
+#     test_lat = 38.9187
+#     test_lon = -77.2311
     
-    get_land_use_data(test_lat, test_lon, radius_meters=1000)
-    get_us_demographics(test_lat, test_lon)
+#     get_land_use_data(test_lat, test_lon, radius_meters=1000)
+#     get_us_demographics(test_lat, test_lon)

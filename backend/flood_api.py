@@ -61,14 +61,9 @@ def get_flood_risk_data(latitude, longitude):
         print(f"Error fetching data: {e}")
         return None
 
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Example coordinates: New Orleans, LA, USA (High flood risk area)
-    test_lat = 38
-    test_lon = 77
-    
-    # Example coordinates: Paris, France (Seine River)
-    # test_lat = 48.8566
-    # test_lon = 2.3522
-    
-    get_flood_risk_data(test_lat, test_lon)
+# if __name__ == "__main__":
+#     # Example coordinates: New Orleans, LA, USA (High flood risk area)
+#     test_lat = 38
+#     test_lon = 77
+
+#     get_flood_risk_data(test_lat, test_lon)

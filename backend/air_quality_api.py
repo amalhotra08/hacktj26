@@ -58,14 +58,13 @@ def get_air_quality_data(latitude, longitude):
         print(f"Error fetching data: {e}")
         return None
 
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Example coordinates: Los Angeles, CA, USA
-    test_lat = 38
-    test_lon = 77
+# if __name__ == "__main__":
+#     # Example coordinates: Los Angeles, CA, USA
+#     test_lat = 38
+#     test_lon = 77
     
-    # Example coordinates: New Delhi, India 
-    # test_lat = 28.6139
-    # test_lon = 77.2090
+#     # Example coordinates: New Delhi, India 
+#     # test_lat = 28.6139
+#     # test_lon = 77.2090
     
-    get_air_quality_data(test_lat, test_lon)
+#     get_air_quality_data(test_lat, test_lon)

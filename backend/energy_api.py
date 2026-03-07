@@ -64,11 +64,11 @@ def get_energy_infrastructure(latitude, longitude, radius_meters=5000):
         print(f"Error fetching infrastructure data: {e}")
         return None
 
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Example coordinates: Near a major power plant or substation
-    # Let's use the Tysons, VA area coordinates from earlier
-    test_lat = 38.9187
-    test_lon = -77.2311
+
+# if __name__ == "__main__":
+#     # Example coordinates: Near a major power plant or substation
+#     # Let's use the Tysons, VA area coordinates from earlier
+#     test_lat = 38.9187
+#     test_lon = -77.2311
     
-    get_energy_infrastructure(test_lat, test_lon, radius_meters=5000)
+#     get_energy_infrastructure(test_lat, test_lon, radius_meters=5000)

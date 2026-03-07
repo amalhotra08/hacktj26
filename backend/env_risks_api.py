@@ -68,14 +68,8 @@ def get_environmental_risk(latitude, longitude):
         print(f"Error fetching environmental risk data: {e}")
         return None
 
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Example coordinates: Malibu, CA (Historically high wildfire and coastal risks)
-    test_lat = 38.9187
-    test_lon = -77.2311
-    
-    # You can swap these out for the Tysons, VA coordinates to see the difference!
-    # test_lat = 38.9187
-    # test_lon = -77.2311
-    
-    get_environmental_risk(test_lat, test_lon)
+
+# if __name__ == "__main__":
+#     test_lat = 38.9187
+#     test_lon = -77.2311
+#     get_environmental_risk(test_lat, test_lon)

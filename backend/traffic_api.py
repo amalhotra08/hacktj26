@@ -63,14 +63,12 @@ def get_traffic_data(latitude, longitude, api_key):
         print(f"Error fetching traffic data: {e}")
         return None
 
-# --- Example Usage ---
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Remember to use a newly generated API key!
-    TOMTOM_API_KEY = "f49bSLLOsW9c8bwQ5PZSq0QHdh0czJR1" 
+# if __name__ == "__main__":
+#     # Remember to use a newly generated API key!
+#     TOMTOM_API_KEY = "f49bSLLOsW9c8bwQ5PZSq0QHdh0czJR1" 
     
-    # Precise coordinates near Tysons, VA (Intersection of Rt 7 & Rt 123)
-    test_lat = 38.9187
-    test_lon = -77.2311
+#     # Precise coordinates near Tysons, VA (Intersection of Rt 7 & Rt 123)
+#     test_lat = 38.9187
+#     test_lon = -77.2311
     
-    get_traffic_data(test_lat, test_lon, TOMTOM_API_KEY)
+#     get_traffic_data(test_lat, test_lon, TOMTOM_API_KEY)

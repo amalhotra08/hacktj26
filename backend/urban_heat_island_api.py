@@ -91,14 +91,8 @@ def get_uhi_estimate(urban_lat, urban_lon):
         print(f"Error fetching UHI data: {e}")
         return None
 
-# --- Example Usage ---
-if __name__ == "__main__":
-    # Example coordinates: Times Square, New York City (High UHI)
-    test_lat = 40.7580
-    test_lon = -73.9855
-    
-    # Example coordinates: Tysons, VA (from earlier)
-    # test_lat = 38.9187
-    # test_lon = -77.2311
-    
-    get_uhi_estimate(test_lat, test_lon)
+# if __name__ == "__main__":
+#     # Example coordinates: Times Square, New York City (High UHI)
+#     test_lat = 40.7580
+#     test_lon = -73.9855
+#     get_uhi_estimate(test_lat, test_lon)
