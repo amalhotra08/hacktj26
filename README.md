@@ -1,6 +1,6 @@
-# City Digital Twin Demo
+# Meridian
 
-AI-powered city digital twin demo with:
+AI-powered city digital twin platform with:
 - map-based intervention editing (`frontend/map_generation`)
 - simulation API (`backend/main.py`)
 - scenario compare, policy bundles, and PDF export

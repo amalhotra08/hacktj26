@@ -494,7 +494,7 @@ def build_spatial_snapshot(
     return zones, flows
 
 
-app = FastAPI(title="City Digital Twin API", version="0.1.0")
+app = FastAPI(title="Meridian API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
