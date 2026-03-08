@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Urban Proposal Visualizer</title>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        min-height: 100vh;
+        background: #0d0d0f;
+        color: #eee;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 48px 48px;
+        pointer-events: none;
+    }
+
+    .card {
+        position: relative;
+        background: rgba(22,22,28,0.92);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 48px 44px 44px;
+        width: 100%;
+        max-width: 520px;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(99,102,241,0.15);
+        border: 1px solid rgba(99,102,241,0.35);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 11px;
+        color: #a5b4fc;
+        letter-spacing: .6px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .badge::before {
+        content: '';
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #818cf8;
+        box-shadow: 0 0 6px #818cf8;
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.25;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: rgba(255,255,255,0.45);
+        margin-bottom: 36px;
+        line-height: 1.6;
+    }
+
+    label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .field { margin-bottom: 20px; }
+
+    input[type="text"], textarea {
+        width: 100%;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 14px;
+        font-family: inherit;
+        padding: 12px 14px;
+        outline: none;
+        transition: border-color .2s, background .2s;
+        resize: none;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+        border-color: rgba(99,102,241,0.6);
+        background: rgba(255,255,255,0.07);
+    }
+
+    input[type="text"]::placeholder, textarea::placeholder {
+        color: rgba(255,255,255,0.25);
+    }
+
+    textarea { height: 110px; }
+
+    button {
+        width: 100%;
+        padding: 13px;
+        background: #4f46e5;
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s, transform .1s;
+        margin-top: 6px;
+    }
+
+    button:hover { background: #6366f1; }
+    button:active { transform: scale(0.985); }
+
+    .error {
+        display: none;
+        color: #f87171;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .error.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Visualize Your City Proposal</h1>
+    <p class="subtitle">Enter a city and describe your urban infrastructure idea.</p>
+
+    <div class="field">
+        <label for="city-input">City</label>
+        <input id="city-input" type="text" placeholder="e.g. Chicago, Tokyo, London" autocomplete="off" />
+        <span class="error" id="city-error">Please enter a city name.</span>
+    </div>
+
+    <div class="field">
+        <label for="proposal-input">Your Proposal</label>
+        <textarea id="proposal-input" placeholder="e.g. Add a protected bike lane along the riverfront from Grant Park to Navy Pier"></textarea>
+        <span class="error" id="proposal-error">Please describe your proposal.</span>
+    </div>
+
+    <button id="go-btn">Visualize on Map &rarr;</button>
+</div>
+
+<script>
+document.getElementById('go-btn').addEventListener('click', () => {
+    const city = document.getElementById('city-input').value.trim();
+    const proposal = document.getElementById('proposal-input').value.trim();
+
+    let valid = true;
+
+    document.getElementById('city-error').classList.remove('visible');
+    document.getElementById('proposal-error').classList.remove('visible');
+
+    if (!city) { document.getElementById('city-error').classList.add('visible'); valid = false; }
+    if (!proposal) { document.getElementById('proposal-error').classList.add('visible'); valid = false; }
+    if (!valid) return;
+
+    const params = new URLSearchParams({ city, proposal });
+    window.location.href = `index.html?${params.toString()}`;
+});
+
+document.getElementById('city-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('proposal-input').focus();
+});
+</script>
+
+</body>
+</html>
