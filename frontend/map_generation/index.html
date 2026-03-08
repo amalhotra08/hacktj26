@@ -158,6 +158,7 @@
 
   .sim-body { padding: 10px 12px 12px; }
 
+<<<<<<< HEAD
   .panel-section {
     margin-top: 8px;
     border-radius: 8px;
@@ -177,12 +178,18 @@
   .panel-section[open] summary::before { content: "▾ "; }
   .panel-section-body { margin-top: 8px; }
 
+=======
+>>>>>>> 3b39f8d (improved integration)
   .sim-controls,
   .scenario-controls,
   .bundle-controls {
     display: grid;
     gap: 6px;
+<<<<<<< HEAD
     margin-top: 0;
+=======
+    margin-top: 6px;
+>>>>>>> 3b39f8d (improved integration)
   }
   .sim-controls { grid-template-columns: repeat(3, 1fr); }
   .scenario-controls { grid-template-columns: repeat(4, 1fr); }
@@ -264,12 +271,20 @@
     color: rgba(255, 255, 255, 0.72);
   }
 
+<<<<<<< HEAD
   #sim-kpis { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+=======
+  #sim-kpis { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+>>>>>>> 3b39f8d (improved integration)
   .sim-kpi {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 7px;
+<<<<<<< HEAD
     padding: 7px;
+=======
+    padding: 6px;
+>>>>>>> 3b39f8d (improved integration)
   }
   .sim-kpi b { display: block; font-size: 10px; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: .5px; }
   .sim-kpi span { display: block; margin-top: 2px; font-size: 12px; color: #fff; }
@@ -383,6 +398,7 @@
       <button id="sim-undo" class="alt">Undo</button>
     </div>
 
+<<<<<<< HEAD
     <details id="advanced-controls" class="panel-section">
       <summary>Advanced Controls</summary>
       <div class="panel-section-body">
@@ -408,6 +424,28 @@
         </div>
       </div>
     </details>
+=======
+    <div class="scenario-controls">
+      <button id="save-a" class="alt">Save A</button>
+      <button id="load-a" class="alt">Load A</button>
+      <button id="save-b" class="alt">Save B</button>
+      <button id="load-b" class="alt">Load B</button>
+    </div>
+
+    <div class="bundle-controls">
+      <select id="bundle-select">
+        <option value="">Select policy bundle...</option>
+        <option value="climate">Climate-first</option>
+        <option value="safety">Safety-first</option>
+        <option value="mobility">Mobility-first</option>
+      </select>
+      <button id="bundle-apply">Apply Bundle</button>
+    </div>
+
+    <div class="bundle-controls">
+      <button id="export-report">Export Report (PDF)</button>
+    </div>
+>>>>>>> 3b39f8d (improved integration)
 
     <p id="sim-status">Waiting for map load...</p>
 
@@ -416,6 +454,7 @@
     <div id="sim-kpis"></div>
     <div id="sim-ranking"></div>
 
+<<<<<<< HEAD
     <details id="compare-wrap" class="panel-section">
       <summary>Scenario A/B Compare</summary>
       <div class="panel-section-body">
@@ -428,6 +467,15 @@
         <div id="compare-metrics"></div>
       </div>
     </details>
+=======
+    <div id="compare-grid">
+      <div class="compare-card"><b>Scenario A Net</b><span id="compare-a">-</span></div>
+      <div class="compare-card"><b>Scenario B Net</b><span id="compare-b">-</span></div>
+      <div class="compare-card"><b>Winner</b><span id="compare-winner">-</span></div>
+    </div>
+    <div id="compare-summary">Save Scenario A and B to compare outcomes.</div>
+    <div id="compare-metrics"></div>
+>>>>>>> 3b39f8d (improved integration)
 
     <details id="why-wrap">
       <summary>Why this changed</summary>
