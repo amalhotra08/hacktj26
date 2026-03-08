@@ -7,7 +7,6 @@ from energy_api import get_energy_infrastructure
 from env_risks_api import get_environmental_risk
 from flood_api import get_flood_risk_data
 from traffic_api import get_traffic_data
-from tree_coverage_api import get_tree_coverage
 from urban_heat_island_api import get_uhi_estimate     
 from weather_api import get_weather_data
 import os
@@ -17,6 +16,22 @@ import math
 
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(env_path)
+
+try:
+    from tree_coverage_api import get_tree_coverage as _get_tree_coverage
+    _TREE_COVERAGE_IMPORT_ERROR = None
+except Exception as exc:
+    _get_tree_coverage = None
+    _TREE_COVERAGE_IMPORT_ERROR = str(exc)
+
+
+def safe_tree_coverage(min_lon, min_lat, max_lon, max_lat):
+    if _get_tree_coverage is None:
+        return {"error": f"tree coverage unavailable: {_TREE_COVERAGE_IMPORT_ERROR}"}
+    try:
+        return _get_tree_coverage(min_lon, min_lat, max_lon, max_lat)
+    except Exception as exc:
+        return {"error": f"tree coverage request failed: {exc}"}
 
 def calculate_bounding_box(lat, lon, radius_km=1):
     """
@@ -74,9 +89,7 @@ class LocationIntelligenceAnalyzer:
                 executor.submit(get_flood_risk_data, latitude, longitude): 'flood_risk',
                 executor.submit(get_traffic_data, latitude, longitude, self.tomtom_api_key): 'traffic',
                 
-                # --- THE FIX IS HERE ---
-                # Check your tree_coverage.py file to ensure the parameter order matches this:
-                executor.submit(get_tree_coverage, min_lat, min_lon, max_lat, max_lon): 'tree_coverage', 
+                executor.submit(safe_tree_coverage, min_lon, min_lat, max_lon, max_lat): 'tree_coverage',
                 
                 executor.submit(get_uhi_estimate, latitude, longitude): 'urban_heat_island',
                 executor.submit(get_weather_data, latitude, longitude): 'weather'

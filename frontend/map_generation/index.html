@@ -6,24 +6,336 @@
 
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+<script src="https://unpkg.com/deck.gl@9.2.11/dist.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-    body { margin:0; }
-    #map { position:absolute; top:0; bottom:0; width:100%; }
+  body { margin: 0; }
+  #map { position: absolute; inset: 0; }
 
-    #legend {
-        position: absolute;
-        bottom: 24px;
-        right: 12px;
-        background: rgba(20,20,20,0.82);
-        color: #eee;
-        font: 12px/1.5 sans-serif;
-        padding: 10px 14px;
-        border-radius: 8px;
-        z-index: 1;
-        pointer-events: none;
-        min-width: 180px;
+  #legend {
+    position: absolute;
+    top: 14px;
+    left: 12px;
+    background: rgba(20, 20, 20, 0.82);
+    color: #eee;
+    font: 12px/1.5 sans-serif;
+    padding: 10px 14px;
+    border-radius: 8px;
+    z-index: 1;
+    pointer-events: none;
+    min-width: 180px;
+  }
+  #legend h4 { margin: 0 0 8px; font-size: 13px; color: #fff; letter-spacing: .5px; }
+  .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .swatch {
+    width: 22px; height: 14px; border-radius: 3px; flex-shrink: 0;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+  }
+  .swatch.circle { width: 14px; height: 14px; border-radius: 50%; }
+  .swatch.line { height: 6px; border-radius: 2px; }
+  .swatch.stripe { background: linear-gradient(to right, #444 40%, #33cc55 40%); }
+  .swatch.bus-stripe { background: linear-gradient(to right, #cc2200 30%, #444 30%); }
+
+  #chat-panel {
+    position: absolute;
+    bottom: 24px;
+    left: 12px;
+    width: 330px;
+    max-height: 440px;
+    background: rgba(18, 18, 18, 0.90);
+    color: #eee;
+    font: 13px/1.5 sans-serif;
+    border-radius: 10px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+  #chat-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #chat-header b { flex: 1; font-size: 13px; }
+  #city-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+  #back-btn {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color .15s;
+  }
+  #back-btn:hover { color: #fff; }
+  #chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 70px;
+    max-height: 280px;
+  }
+  .cm { max-width: 90%; padding: 5px 9px; border-radius: 8px; font-size: 12px; word-wrap: break-word; }
+  .cm.user { background: #1a4a8a; align-self: flex-end; }
+  .cm.assistant { background: rgba(255, 255, 255, 0.11); align-self: flex-start; }
+  .cm.thinking { background: rgba(255, 255, 255, 0.06); align-self: flex-start; color: rgba(255,255,255,0.4); font-style: italic; }
+  #chat-footer {
+    padding: 7px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 6px;
+  }
+  #chat-input {
+    flex: 1;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+  }
+  #chat-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+  #chat-send {
+    padding: 6px 11px;
+    background: #1a4a8a;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  #chat-send:hover { background: #2255bb; }
+  #chat-send:disabled { opacity: 0.45; cursor: default; }
+
+  #sim-panel {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    width: 390px;
+    max-height: calc(100vh - 28px);
+    overflow: auto;
+    background: rgba(10, 10, 12, 0.93);
+    color: #f0f0f0;
+    font: 12px/1.4 sans-serif;
+    border-radius: 12px;
+    z-index: 3;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+  .sim-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .sim-header h4 { margin: 0; font-size: 16px; color: #fff; }
+  #health-badge {
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  #health-badge.live { background: rgba(55, 168, 99, 0.25); color: #8ef7b5; border: 1px solid rgba(80,200,120,0.45); }
+  #health-badge.degraded { background: rgba(181, 74, 74, 0.28); color: #ffc4c4; border: 1px solid rgba(255,90,90,0.45); }
+
+  .sim-body { padding: 10px 12px 12px; }
+
+  .sim-controls,
+  .scenario-controls,
+  .bundle-controls {
+    display: grid;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .sim-controls { grid-template-columns: repeat(3, 1fr); }
+  .scenario-controls { grid-template-columns: repeat(4, 1fr); }
+  .bundle-controls { grid-template-columns: 1fr auto; align-items: center; }
+
+  .sim-controls button,
+  .scenario-controls button,
+  #bundle-apply,
+  #export-report {
+    border: none;
+    border-radius: 8px;
+    padding: 7px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #09131f;
+    background: linear-gradient(90deg, #f08a3a, #ffb15a);
+  }
+  .scenario-controls button,
+  #bundle-apply,
+  #export-report {
+    background: rgba(255, 255, 255, 0.13);
+    color: #f3f3f3;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+  }
+
+  #bundle-select {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  #sim-status {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.76);
+    min-height: 17px;
+    font-size: 11px;
+  }
+
+  #timeline,
+  #compare-grid {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .timeline-card,
+  .compare-card {
+    border-radius: 8px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+  }
+  .timeline-card b,
+  .compare-card b {
+    display: block;
+    font-size: 10px;
+    color: rgba(255,255,255,0.82);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+  .timeline-card span,
+  .compare-card span {
+    display: block;
+    margin-top: 2px;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  #sim-meta,
+  #compare-summary {
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  #sim-kpis { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .sim-kpi {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 7px;
+    padding: 6px;
+  }
+  .sim-kpi b { display: block; font-size: 10px; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: .5px; }
+  .sim-kpi span { display: block; margin-top: 2px; font-size: 12px; color: #fff; }
+  .sim-kpi em { display: block; margin-top: 1px; font-style: normal; font-size: 11px; }
+  .sim-kpi small { display: block; margin-top: 3px; font-size: 10px; color: rgba(255,255,255,0.66); }
+
+  .kpi-badges { margin-top: 3px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .badge {
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .badge.conf-high { color: #8ef7b5; border-color: rgba(80,200,120,0.45); }
+  .badge.conf-medium { color: #ffe29f; border-color: rgba(255,190,80,0.45); }
+  .badge.conf-low { color: #ffc4c4; border-color: rgba(255,90,90,0.45); }
+
+  .kpi-details {
+    margin-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 3px;
+  }
+  .kpi-details summary {
+    cursor: pointer;
+    font-size: 10px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 700;
+    list-style: none;
+  }
+  .kpi-details summary::-webkit-details-marker { display: none; }
+  .kpi-details summary::before { content: "▸ "; color: rgba(255,255,255,0.7); }
+  .kpi-details[open] summary::before { content: "▾ "; }
+  .kpi-detail-text {
+    margin-top: 4px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.66);
+    line-height: 1.35;
+  }
+
+  #sim-ranking,
+  #compare-metrics {
+    margin-top: 8px;
+    border-radius: 8px;
+    padding: 7px 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 11px;
+  }
+  #sim-ranking b,
+  #compare-metrics b { color: #fff; }
+
+  #why-wrap {
+    margin-top: 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 6px 8px;
+  }
+  #why-wrap summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+  }
+  #why-list { margin: 6px 0 0; padding-left: 14px; }
+  #why-list li { margin-bottom: 3px; font-size: 11px; color: rgba(255,255,255,0.78); }
+
+  .sim-pos { color: #87f2ae; }
+  .sim-neg { color: #ff9ba6; }
+
+  @media (max-width: 1050px) {
+    #sim-panel { width: 340px; }
+    #chat-panel { width: 300px; }
+  }
+
+  @media (max-width: 768px) {
+    #sim-panel {
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      width: auto;
+      max-height: 52vh;
     }
+<<<<<<< HEAD
     #legend h4 { margin: 0 0 8px; font-size: 13px; color: #fff; letter-spacing:.5px; }
 
     #chat-panel {
@@ -88,14 +400,82 @@
     .swatch.line   { height: 6px; border-radius: 2px; }
     .swatch.stripe     { background: linear-gradient(to right, #444 40%, #33cc55 40%); }
     .swatch.bus-stripe { background: linear-gradient(to right, #cc2200 30%, #444 30%); }
+=======
+    #chat-panel {
+      left: 8px;
+      right: 8px;
+      width: auto;
+      bottom: 8px;
+      max-height: 40vh;
+    }
+    #legend { display: none; }
+    .scenario-controls { grid-template-columns: repeat(2, 1fr); }
+    #compare-grid { grid-template-columns: 1fr; }
+  }
+>>>>>>> 3b39f8d (improved integration)
 </style>
 </head>
-
 <body>
 
 <div id="map"></div>
 
+<div id="sim-panel">
+  <div class="sim-header">
+    <h4>Scenario Timeline</h4>
+    <span id="health-badge" class="degraded">Degraded</span>
+  </div>
+  <div class="sim-body">
+    <div class="sim-controls">
+      <button id="sim-run">Run Simulation</button>
+      <button id="sim-reset" class="alt">Reset</button>
+      <button id="sim-undo" class="alt">Undo</button>
+    </div>
+
+    <div class="scenario-controls">
+      <button id="save-a" class="alt">Save A</button>
+      <button id="load-a" class="alt">Load A</button>
+      <button id="save-b" class="alt">Save B</button>
+      <button id="load-b" class="alt">Load B</button>
+    </div>
+
+    <div class="bundle-controls">
+      <select id="bundle-select">
+        <option value="">Select policy bundle...</option>
+        <option value="climate">Climate-first</option>
+        <option value="safety">Safety-first</option>
+        <option value="mobility">Mobility-first</option>
+      </select>
+      <button id="bundle-apply">Apply Bundle</button>
+    </div>
+
+    <div class="bundle-controls">
+      <button id="export-report">Export Report (PDF)</button>
+    </div>
+
+    <p id="sim-status">Waiting for map load...</p>
+
+    <div id="timeline"></div>
+    <div id="sim-meta"></div>
+    <div id="sim-kpis"></div>
+    <div id="sim-ranking"></div>
+
+    <div id="compare-grid">
+      <div class="compare-card"><b>Scenario A Net</b><span id="compare-a">-</span></div>
+      <div class="compare-card"><b>Scenario B Net</b><span id="compare-b">-</span></div>
+      <div class="compare-card"><b>Winner</b><span id="compare-winner">-</span></div>
+    </div>
+    <div id="compare-summary">Save Scenario A and B to compare outcomes.</div>
+    <div id="compare-metrics"></div>
+
+    <details id="why-wrap">
+      <summary>Why this changed</summary>
+      <ul id="why-list"></ul>
+    </details>
+  </div>
+</div>
+
 <div id="chat-panel">
+<<<<<<< HEAD
     <div id="chat-header">
         <b>Map Assistant</b>
         <span id="city-label"></span>
@@ -122,108 +502,321 @@
 
 <script>
 
+=======
+  <div id="chat-header">
+    <b>Map Assistant</b>
+    <span id="city-label"></span>
+    <a id="back-btn" href="home.html">&#8592; Back</a>
+  </div>
+  <div id="chat-messages"></div>
+  <div id="chat-footer">
+    <input id="chat-input" type="text" placeholder="Add a bike lane from ... to ..." />
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<div id="legend">
+  <h4>Map Key</h4>
+  <div class="legend-row"><div class="swatch stripe"></div><span>Bike Lane</span></div>
+  <div class="legend-row"><div class="swatch bus-stripe"></div><span>Bus Lane</span></div>
+  <div class="legend-row"><div class="swatch line" style="background:#c8b48a;border-color:#7a6a4a;"></div><span>Pedestrian Street</span></div>
+  <div class="legend-row"><div class="swatch" style="background:#3a9e44;"></div><span>Park</span></div>
+  <div class="legend-row"><div class="swatch circle" style="background:#2d8a2d;border-color:#1a5e1a;"></div><span>Trees</span></div>
+  <div class="legend-row"><div class="swatch" style="background:#1a8fbf;"></div><span>Flood Mitigation</span></div>
+  <div class="legend-row"><div class="swatch circle" style="background:#FFD700;border-color:#CC7700;"></div><span>Solar Panels</span></div>
+</div>
+
+<script>
+>>>>>>> 3b39f8d (improved integration)
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2Fuc3VicmExMyIsImEiOiJjbW1nb2g2bHgwaWduMnFwcmthNWNtZWpwIn0.YbKSy-h3T67-qFfsDnnszw';
-const GROQ_API_KEY = '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';
+const SIM_API_BASE = 'http://localhost:8001';
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const params = new URLSearchParams(window.location.search);
-if (!params.get('city')) { window.location.replace('home.html'); }
-const CITY     = params.get('city');
+if (!params.get('city')) window.location.replace('home.html');
+const CITY = params.get('city');
 const PROPOSAL = params.get('proposal') || '';
 
 document.getElementById('city-label').textContent = CITY;
 document.title = `Map — ${CITY}`;
 
-async function geocodeCity(name) {
-    const q = encodeURIComponent(name);
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?types=place,region,country&access_token=${MAPBOX_TOKEN}`;
-    const r = await fetch(url);
-    const d = await r.json();
-    return d.features.length ? d.features[0].center : [-77.03, 38.90];
-}
+const SCENARIO_STORAGE_KEY = `cityTwinScenarios:${String(CITY).toLowerCase()}`;
+
+const METRIC_META = {
+  traffic_flow: {
+    title: 'Travel Delay',
+    meaning: 'Higher score means less congestion and faster trips.'
+  },
+  carbon: {
+    title: 'Air Pollution Exposure',
+    meaning: 'Higher score means cleaner air and lower emissions impact.'
+  },
+  safety: {
+    title: 'Street Safety Risk',
+    meaning: 'Higher score means lower crash and hazard risk.'
+  },
+  urban_heat: {
+    title: 'Heat Stress',
+    meaning: 'Higher score means cooler streets and less heat burden.'
+  },
+  resilience: {
+    title: 'Flood/Disruption Readiness',
+    meaning: 'Higher score means better recovery from shocks.'
+  }
+};
+
+const FEATURE_TO_INTERVENTION = {
+  bike_lane: 'bike_lane',
+  bus_lane: 'bus_lane',
+  tree: 'tree_planting',
+  park: 'tree_planting',
+  solar_panel: 'solar_panel',
+  flood_mitigation: 'flood_mitigation',
+  pedestrian_street: 'pedestrianization'
+};
+
+const INTERVENTION_LABELS = {
+  bike_lane: 'bike lanes',
+  bus_lane: 'bus priority lanes',
+  tree_planting: 'tree planting',
+  pedestrianization: 'pedestrian upgrades',
+  street_redesign: 'street redesign',
+  solar_panel: 'solar installation',
+  flood_mitigation: 'flood mitigation'
+};
+
+const INTERVENTION_BRIEFS = {
+  bike_lane: 'Added bike lanes to shift short trips away from cars and improve safety for cyclists.',
+  bus_lane: 'Added dedicated bus lanes to speed up transit and reduce stop-and-go traffic.',
+  tree_planting: 'Planted trees to lower street heat and improve local air quality.',
+  pedestrianization: 'Expanded pedestrian-first streets to calm traffic and improve walking safety.',
+  street_redesign: 'Redesigned street layout to reduce conflict points and make movement safer.',
+  solar_panel: 'Added solar coverage to cut grid emissions and improve local energy resilience.',
+  flood_mitigation: 'Added flood protection features to reduce disruption during heavy rain events.'
+};
+
+const BUNDLES = {
+  climate: {
+    bike_lane: 1.5,
+    tree_planting: 2.5,
+    solar_panel: 2.0,
+    pedestrianization: 0.5
+  },
+  safety: {
+    street_redesign: 2.5,
+    pedestrianization: 1.5,
+    bike_lane: 1.0,
+    flood_mitigation: 0.8
+  },
+  mobility: {
+    bus_lane: 2.5,
+    bike_lane: 1.6,
+    pedestrianization: 1.2,
+    street_redesign: 1.0
+  }
+};
 
 let map;
 let cityCenter;
+let simDeckOverlay = null;
+let scenarioInterventions = {};
+let actionStack = [];
+let history = [];
+let latestSimulation = null;
+let lastGoodSimulation = null;
+let scenarioSlots = { baseline: null, A: null, B: null };
 
-geocodeCity(CITY).then(center => {
-    cityCenter = center;
-    map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/standard',
-        center,
-        zoom: 14,
-        pitch: 50,
-        bearing: 0
-    });
+function uid(prefix) {
+  return `${prefix}-dyn-${Math.random().toString(36).slice(2, 9)}`;
+}
 
-    map.on('load', () => {
-        map.addSource('mapbox-dem', {
-            type: 'raster-dem',
-            url: 'mapbox://mapbox.terrain-rgb',
-            tileSize: 512,
-            maxzoom: 14
-        });
-        map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+function nowIso() {
+  return new Date().toISOString();
+}
 
-        map.addLayer({
-            id: '3d-buildings',
-            source: 'composite',
-            'source-layer': 'building',
-            type: 'fill-extrusion',
-            paint: {
-                'fill-extrusion-color': [
-                    'interpolate', ['linear'], ['get', 'height'],
-                    0,   '#aaaaaa',
-                    50,  '#8899bb',
-                    100, '#5577cc',
-                    150, '#2244aa',
-                    200, '#0a1a6e'
-                ],
-                'fill-extrusion-height': ['get', 'height'],
-                'fill-extrusion-base':   ['get', 'min_height'],
-                'fill-extrusion-opacity': 0.9
-            }
-        });
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
 
-        if (PROPOSAL) {
-            appendMsg('assistant', `Welcome! I'll visualize your proposal for ${CITY}.`);
-            setTimeout(() => sendProposal(PROPOSAL), 400);
-        } else {
-            appendMsg('assistant', `Map loaded for ${CITY}. Describe an urban feature to add.`);
-        }
-    });
-});
+function removeLayer(id) { if (map && map.getLayer(id)) map.removeLayer(id); }
+function removeSource(id) { if (map && map.getSource(id)) map.removeSource(id); }
 
-let dynCount = 0;
-function uid(p) { return `${p}-dyn-${++dynCount}`; }
+function removeFeatureArtifact(id, type) {
+  if (!map) return;
+  const suffixes = {
+    route: ['s', 'l', 'd', 'c', 'el', 'er'],
+    ped: ['s', 'el', 'er'],
+    flood: ['f', 'o'],
+    point: ['c'],
+    park: ['f', 'o']
+  }[type] || [];
+  for (const s of suffixes) removeLayer(`${id}-${s}`);
+  removeSource(id);
+}
+
+function clearMapArtifacts() {
+  while (actionStack.length) {
+    const item = actionStack.pop();
+    if (item.kind === 'feature') {
+      removeFeatureArtifact(item.id, item.type);
+    }
+  }
+}
+
+function scoreBand(v) {
+  if (v >= 80) return 'Strong';
+  if (v >= 65) return 'Good';
+  if (v >= 50) return 'Moderate';
+  return 'Needs work';
+}
+
+function formatDelta(v) {
+  return `${v >= 0 ? '+' : ''}${v.toFixed(1)}`;
+}
+
+function compositeScore(metrics) {
+  const vals = Object.values(metrics || {});
+  if (!vals.length) return 0;
+  return vals.reduce((sum, n) => sum + Number(n || 0), 0) / vals.length;
+}
+
+function setHealthBadge(live) {
+  const badge = document.getElementById('health-badge');
+  badge.className = live ? 'live' : 'degraded';
+  badge.textContent = live ? 'Live' : 'Degraded';
+}
+
+function confidenceBand(v) {
+  if (v >= 75) return { label: 'Confidence: High', cls: 'conf-high' };
+  if (v >= 50) return { label: 'Confidence: Medium', cls: 'conf-medium' };
+  return { label: 'Confidence: Low', cls: 'conf-low' };
+}
+
+function loadScenarioSlots() {
+  try {
+    const raw = localStorage.getItem(SCENARIO_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      scenarioSlots = { ...scenarioSlots, ...parsed };
+    }
+  } catch {
+    // ignore storage errors
+  }
+}
+
+function persistScenarioSlots() {
+  try {
+    localStorage.setItem(SCENARIO_STORAGE_KEY, JSON.stringify(scenarioSlots));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+function scenarioSnapshotLabel(slot) {
+  const s = scenarioSlots[slot];
+  if (!s) return `${slot}: empty`;
+  const when = new Date(s.savedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const comp = compositeScore(s.simulation?.proposal_metrics || s.simulation?.baseline_metrics || {});
+  return `${slot}: ${comp.toFixed(1)} @ ${when}`;
+}
+
+function updateScenarioButtonsLabel() {
+  document.getElementById('save-a').title = scenarioSnapshotLabel('A');
+  document.getElementById('load-a').title = scenarioSnapshotLabel('A');
+  document.getElementById('save-b').title = scenarioSnapshotLabel('B');
+  document.getElementById('load-b').title = scenarioSnapshotLabel('B');
+}
+
+function refreshCompareView() {
+  const a = scenarioSlots.A;
+  const b = scenarioSlots.B;
+
+  const compareA = document.getElementById('compare-a');
+  const compareB = document.getElementById('compare-b');
+  const compareWinner = document.getElementById('compare-winner');
+  const compareSummary = document.getElementById('compare-summary');
+  const compareMetrics = document.getElementById('compare-metrics');
+
+  if (!a || !b || !a.simulation || !b.simulation) {
+    compareA.textContent = '-';
+    compareB.textContent = '-';
+    compareWinner.textContent = '-';
+    compareSummary.textContent = 'Save Scenario A and B to compare outcomes.';
+    compareMetrics.innerHTML = '';
+    return;
+  }
+
+  const aScore = compositeScore(a.simulation.proposal_metrics || {});
+  const bScore = compositeScore(b.simulation.proposal_metrics || {});
+  compareA.textContent = aScore.toFixed(1);
+  compareB.textContent = bScore.toFixed(1);
+
+  if (aScore > bScore + 0.05) {
+    compareWinner.textContent = 'Scenario A';
+  } else if (bScore > aScore + 0.05) {
+    compareWinner.textContent = 'Scenario B';
+  } else {
+    compareWinner.textContent = 'Tie';
+  }
+
+  const metricRows = [];
+  for (const key of Object.keys(METRIC_META)) {
+    const aDelta = Number(a.simulation.deltas?.[key] || 0);
+    const bDelta = Number(b.simulation.deltas?.[key] || 0);
+    let winner = 'Tie';
+    if (aDelta > bDelta + 0.05) winner = 'A';
+    else if (bDelta > aDelta + 0.05) winner = 'B';
+    metricRows.push(`<div><b>${METRIC_META[key].title}:</b> A ${formatDelta(aDelta)} vs B ${formatDelta(bDelta)} • Winner ${winner}</div>`);
+  }
+  compareMetrics.innerHTML = metricRows.join('');
+
+  compareSummary.textContent = `A saved ${new Date(a.savedAt).toLocaleString()} • B saved ${new Date(b.savedAt).toLocaleString()}`;
+}
+
+async function checkBackendHealth() {
+  try {
+    const r = await fetch(`${SIM_API_BASE}/health`, { method: 'GET' });
+    setHealthBadge(r.ok);
+  } catch {
+    setHealthBadge(false);
+  }
+}
+
+async function geocodeCity(name) {
+  const q = encodeURIComponent(name);
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?types=place,region,country&access_token=${MAPBOX_TOKEN}`;
+  const r = await fetch(url);
+  const d = await r.json();
+  return d.features.length ? d.features[0].center : [-77.03, 38.90];
+}
 
 async function geocodePlace(place) {
-    const q = encodeURIComponent(place);
-    const R = 0.15; // ~15km hard bbox around city center
-    const bbox = `${cityCenter[0]-R},${cityCenter[1]-R},${cityCenter[0]+R},${cityCenter[1]+R}`;
-    const base = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json`
-               + `?bbox=${bbox}`
-               + `&proximity=${cityCenter[0]},${cityCenter[1]}`
-               + `&access_token=${MAPBOX_TOKEN}`;
+  const q = encodeURIComponent(place);
+  const R = 0.15;
+  const bbox = `${cityCenter[0]-R},${cityCenter[1]-R},${cityCenter[0]+R},${cityCenter[1]+R}`;
+  const base = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json`
+             + `?bbox=${bbox}`
+             + `&proximity=${cityCenter[0]},${cityCenter[1]}`
+             + `&access_token=${MAPBOX_TOKEN}`;
 
-    // First try: POI/address types (more precise)
-    let r = await fetch(base + '&types=poi,address');
-    let d = await r.json();
-    if (d.features?.length) return d.features[0].center;
+  let r = await fetch(base + '&types=poi,address');
+  let d = await r.json();
+  if (d.features?.length) return d.features[0].center;
 
-    // Fallback: no type restriction (catches landmarks, neighborhoods, etc.)
-    r = await fetch(base);
-    d = await r.json();
-    return d.features?.length ? d.features[0].center : null;
+  r = await fetch(base);
+  d = await r.json();
+  return d.features?.length ? d.features[0].center : null;
 }
 
 function nearbyCoords(coords) {
-    const angle = Math.random() * 2 * Math.PI;
-    const dist = 0.0007; // ~70m offset onto a nearby street
-    return [coords[0] + Math.cos(angle) * dist, coords[1] + Math.sin(angle) * dist];
+  const angle = Math.random() * 2 * Math.PI;
+  const dist = 0.0007;
+  return [coords[0] + Math.cos(angle) * dist, coords[1] + Math.sin(angle) * dist];
 }
 
+<<<<<<< HEAD
 function dynRoute(id, profile, start, end, color, offset, divOffset) {
     return fetch(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
     .then(r => r.json()).then(d => {
@@ -274,27 +867,160 @@ function dynFlood(id, start, end) {
         paint:{'fill-color':'#1a8fbf','fill-opacity':0.70} });
     map.addLayer({ id:`${id}-o`, type:'line', source:id, slot:'top',
         paint:{'line-color':'#0a5a82','line-width':2} });
+=======
+function offsetLngLat(center, eastMeters, northMeters) {
+  const [lng, lat] = center;
+  const dLat = northMeters / 111320;
+  const cosLat = Math.max(0.2, Math.cos(lat * Math.PI / 180));
+  const dLng = eastMeters / (111320 * cosLat);
+  return [lng + dLng, lat + dLat];
 }
 
-function dynPoint(id, coords, color, stroke, radius=10) {
-    map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:{ type:'Point', coordinates:coords } } });
-    map.addLayer({ id:`${id}-c`, type:'circle', source:id, slot:'top',
-        paint:{'circle-radius':radius,'circle-color':color,'circle-stroke-width':2.5,'circle-stroke-color':stroke} });
+async function renderBundleVisuals() {
+  if (!map || !cityCenter) return;
+
+  const corridorSeeds = [
+    [-750, -220, 760, -180],
+    [-680, 300, 700, 340],
+    [-260, -740, -240, 760],
+    [300, -680, 500, 660],
+    [-820, 30, 820, 50]
+  ];
+
+  const pointSeeds = [
+    [200, 260], [-260, 220], [340, -180], [-320, -260], [120, -360],
+    [460, 80], [-470, 40], [20, 520], [-40, -520], [600, 300]
+  ];
+
+  const buildUnits = [];
+  for (const [type, rawIntensity] of Object.entries(scenarioInterventions)) {
+    const intensity = Number(rawIntensity || 0);
+    if (intensity <= 0) continue;
+    const unitCount = Math.max(1, Math.round(intensity));
+    const unitAmount = intensity / unitCount;
+    for (let i = 0; i < unitCount; i++) {
+      buildUnits.push({ type, amount: unitAmount });
+    }
+  }
+
+  let routeIdx = 0;
+  let pointIdx = 0;
+  const renderedCoords = [];
+
+  for (const unit of buildUnits) {
+    const type = unit.type;
+    const amount = Number(unit.amount || 1);
+    const feature = Object.keys(FEATURE_TO_INTERVENTION).find(k => FEATURE_TO_INTERVENTION[k] === type) || type;
+    const id = uid(type);
+
+    if (type === 'bike_lane' || type === 'bus_lane' || type === 'pedestrianization' || type === 'street_redesign' || type === 'flood_mitigation') {
+      const seed = corridorSeeds[routeIdx % corridorSeeds.length];
+      routeIdx += 1;
+      const start = offsetLngLat(cityCenter, seed[0], seed[1]);
+      const end = offsetLngLat(cityCenter, seed[2], seed[3]);
+      renderedCoords.push(start, end);
+
+      try {
+        if (type === 'bike_lane') {
+          await dynRoute(id, 'cycling', start, end, '#33cc55', -10, -6);
+          actionStack.push({ kind: 'feature', id, type: 'route', feature, amount });
+        } else if (type === 'bus_lane') {
+          await dynRoute(id, 'driving', start, end, '#cc2200', 10, 6);
+          actionStack.push({ kind: 'feature', id, type: 'route', feature, amount });
+        } else if (type === 'pedestrianization') {
+          await dynPed(id, start, end);
+          actionStack.push({ kind: 'feature', id, type: 'ped', feature: 'pedestrian_street', amount });
+        } else if (type === 'street_redesign') {
+          await dynRoute(id, 'driving', start, end, '#f4a261', 0, 0);
+          actionStack.push({ kind: 'feature', id, type: 'route', feature, amount });
+        } else if (type === 'flood_mitigation') {
+          dynFlood(id, start, end);
+          actionStack.push({ kind: 'feature', id, type: 'flood', feature, amount });
+        }
+      } catch {
+        // Skip any route that fails to resolve.
+      }
+    } else if (type === 'tree_planting' || type === 'solar_panel') {
+      const seed = pointSeeds[pointIdx % pointSeeds.length];
+      pointIdx += 1;
+      const coords = offsetLngLat(cityCenter, seed[0], seed[1]);
+      renderedCoords.push(coords);
+
+      if (type === 'tree_planting') {
+        dynPoint(id, coords, '#2d8a2d', '#1a5e1a', 9);
+        actionStack.push({ kind: 'feature', id, type: 'point', feature: 'tree', amount });
+      } else {
+        dynPoint(id, coords, '#FFD700', '#CC7700', 9);
+        actionStack.push({ kind: 'feature', id, type: 'point', feature: 'solar_panel', amount });
+      }
+    }
+  }
+
+  if (renderedCoords.length) {
+    const bounds = renderedCoords.reduce(
+      (b, c) => b.extend(c),
+      new mapboxgl.LngLatBounds(renderedCoords[0], renderedCoords[0])
+    );
+    map.fitBounds(bounds, { padding: 120, duration: 1200, maxZoom: 15.5 });
+  }
+}
+
+function dynRoute(id, profile, start, end, color, offset, divOffset) {
+  return fetch(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
+  .then(r => r.json()).then(d => {
+    if (!d.routes?.length) throw new Error('No route found');
+    const geom = d.routes[0].geometry;
+    map.addSource(id, { type: 'geojson', data: { type: 'Feature', geometry: geom } });
+    map.addLayer({ id: `${id}-s`, type: 'line', source: id, slot: 'top', layout: {'line-cap': 'round', 'line-join': 'round'}, paint: {'line-color': '#444', 'line-width': 28} });
+    map.addLayer({ id: `${id}-l`, type: 'line', source: id, slot: 'top', layout: {'line-cap': 'butt', 'line-join': 'round'}, paint: {'line-color': color, 'line-width': 7, 'line-offset': offset} });
+    map.addLayer({ id: `${id}-d`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#fff', 'line-width': 1.5, 'line-offset': divOffset, 'line-dasharray': [4,4]} });
+    map.addLayer({ id: `${id}-c`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#ffff00', 'line-width': 1.5, 'line-dasharray': [6,5]} });
+    map.addLayer({ id: `${id}-el`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#fff', 'line-width': 1.5, 'line-offset': 13} });
+    map.addLayer({ id: `${id}-er`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#fff', 'line-width': 1.5, 'line-offset': -13} });
+  });
+}
+
+function dynPed(id, start, end) {
+  return fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
+  .then(r => r.json()).then(d => {
+    if (!d.routes?.length) throw new Error('No route found');
+    const geom = d.routes[0].geometry;
+    map.addSource(id, { type: 'geojson', data: { type: 'Feature', geometry: geom } });
+    map.addLayer({ id: `${id}-s`, type: 'line', source: id, slot: 'top', layout: {'line-cap': 'round', 'line-join': 'round'}, paint: {'line-color': '#c8b48a', 'line-width': 20} });
+    map.addLayer({ id: `${id}-el`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#7a6a4a', 'line-width': 2.5, 'line-offset': 9} });
+    map.addLayer({ id: `${id}-er`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#7a6a4a', 'line-width': 2.5, 'line-offset': -9} });
+  });
+}
+
+function dynFlood(id, start, end) {
+  const w = 0.0003;
+  map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+    [start[0], start[1] + w], [end[0], end[1] + w],
+    [end[0], end[1] - w], [start[0], start[1] - w],
+    [start[0], start[1] + w]
+  ]]}}});
+  map.addLayer({ id: `${id}-f`, type: 'fill', source: id, slot: 'top', paint: {'fill-color': '#1a8fbf', 'fill-opacity': 0.70} });
+  map.addLayer({ id: `${id}-o`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#0a5a82', 'line-width': 2} });
+>>>>>>> 3b39f8d (improved integration)
+}
+
+function dynPoint(id, coords, color, stroke, radius = 10) {
+  map.addSource(id, { type: 'geojson', data: { type: 'Feature', geometry: { type: 'Point', coordinates: coords } } });
+  map.addLayer({ id: `${id}-c`, type: 'circle', source: id, slot: 'top', paint: {'circle-radius': radius, 'circle-color': color, 'circle-stroke-width': 2.5, 'circle-stroke-color': stroke} });
 }
 
 function dynPark(id, center) {
-    const d = 0.0025;
-    map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:{ type:'Polygon', coordinates:[[
-        [center[0]-d,center[1]-d],[center[0]+d,center[1]-d],
-        [center[0]+d,center[1]+d],[center[0]-d,center[1]+d],
-        [center[0]-d,center[1]-d]
-    ]]}}});
-    map.addLayer({ id:`${id}-f`, type:'fill', source:id, slot:'top',
-        paint:{'fill-color':'#3a9e44','fill-opacity':0.45} });
-    map.addLayer({ id:`${id}-o`, type:'line', source:id, slot:'top',
-        paint:{'line-color':'#1e6b25','line-width':2.5} });
+  const d = 0.0025;
+  map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+    [center[0]-d,center[1]-d], [center[0]+d,center[1]-d],
+    [center[0]+d,center[1]+d], [center[0]-d,center[1]+d],
+    [center[0]-d,center[1]-d]
+  ]]}}});
+  map.addLayer({ id: `${id}-f`, type: 'fill', source: id, slot: 'top', paint: {'fill-color': '#3a9e44', 'fill-opacity': 0.45} });
+  map.addLayer({ id: `${id}-o`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#1e6b25', 'line-width': 2.5} });
 }
 
+<<<<<<< HEAD
 async function executeAdd(parsed) {
     const f = parsed.feature;
     const routeFeatures = ['bike_lane','bus_lane','pedestrian_street','flood_mitigation'];
@@ -329,31 +1055,68 @@ async function executeAdd(parsed) {
 const SYSTEM_PROMPT = `
 You are an urban infrastructure map assistant for ${CITY}.
 Parse user requests to add features to a map. Always respond with valid JSON only — no other text.
+=======
+function incrementInterventionForFeature(feature, amount = 1) {
+  const k = FEATURE_TO_INTERVENTION[feature];
+  if (!k) return;
+  scenarioInterventions[k] = (scenarioInterventions[k] || 0) + amount;
+  if (scenarioInterventions[k] <= 0) delete scenarioInterventions[k];
+}
 
-Supported features:
-  Route features (need "start" AND "end" locations in ${CITY}):
-    bike_lane, bus_lane, pedestrian_street, flood_mitigation
-  Point/area features (need a single "location" in ${CITY}):
-    bus_stop, park, tree, solar_panel
+function appendMsg(role, text, extraClass) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `cm ${role}${extraClass ? ' ' + extraClass : ''}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+>>>>>>> 3b39f8d (improved integration)
 
-Response formats:
-  If all info present and it is a route feature:
-    {"action":"add","feature":"<type>","start":"<location>","end":"<location>"}
-  If all info present and it is a point feature:
-    {"action":"add","feature":"<type>","location":"<location>"}
-  If required location info is missing:
-    {"action":"clarify","message":"<question asking specifically what is missing>"}
-  If request is unclear or unsupported:
-    {"action":"unknown","message":"<brief helpful response>"}
+function renderPlaceholder() {
+  document.getElementById('timeline').innerHTML = `
+    <div class="timeline-card"><b>Baseline</b><span>-</span></div>
+    <div class="timeline-card"><b>Proposed</b><span>-</span></div>
+    <div class="timeline-card"><b>Net Impact</b><span>-</span></div>
+  `;
+  document.getElementById('sim-kpis').innerHTML = '';
+  document.getElementById('sim-meta').textContent = 'No simulation data yet.';
+  document.getElementById('sim-ranking').textContent = 'Waiting for simulation results.';
+  document.getElementById('why-list').innerHTML = '<li>No explainability data yet.</li>';
+}
 
-For "location", "start", and "end" values, always output the specific street address in ${CITY} — you know these, translate silently without asking the user (e.g. user says "White House" → you output "1600 Pennsylvania Ave NW", user says "Lincoln Memorial" → you output "2 Lincoln Memorial Cir NW"). Never output vague phrases like "near the White House".
-`.trim();
+function formatUpdatedTime(isoStr) {
+  if (!isoStr) return 'Unknown';
+  const d = new Date(isoStr);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
 
-let history = [];
+function metricReason(metricKey, summary) {
+  const items = [];
+  for (const entry of (summary || [])) {
+    const value = Number(entry.metric_contribution?.[metricKey] || 0);
+    if (!value) continue;
+    items.push({ value, type: entry.type, intensity: entry.intensity });
+  }
+  if (!items.length) return 'No direct intervention contribution.';
+  items.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+  const top = items[0];
+  const label = INTERVENTION_LABELS[top.type] || top.type;
+  return `${formatDelta(top.value)} from ${label} (x${top.intensity})`;
+}
 
-async function callGroq(userText) {
-    history.push({ role: 'user', content: userText });
+function describeInterventionEnglish(item) {
+  const type = String(item?.type || '');
+  const label = INTERVENTION_LABELS[type] || type.replace(/_/g, ' ');
+  const base = INTERVENTION_BRIEFS[type] || `Applied ${label} to improve neighborhood performance.`;
+  const contrib = item?.metric_contribution || {};
 
+  const ranked = Object.entries(contrib)
+    .map(([k, v]) => ({ key: k, val: Number(v || 0) }))
+    .sort((a, b) => Math.abs(b.val) - Math.abs(a.val));
+
+<<<<<<< HEAD
     const thinking = appendMsg('assistant', 'Thinking…', 'thinking');
 
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -370,9 +1133,176 @@ async function callGroq(userText) {
     });
 
     thinking.remove();
+=======
+  const positives = ranked.filter(r => r.val > 0).slice(0, 2).map(r => METRIC_META[r.key]?.title || r.key);
+  const negatives = ranked.filter(r => r.val < 0).slice(0, 1).map(r => METRIC_META[r.key]?.title || r.key);
 
-    if (!resp.ok) { appendMsg('assistant', `Groq error ${resp.status} — check API key.`); return; }
+  let impactLine = '';
+  if (positives.length) impactLine = ` Primary impact: ${positives.join(' and ')}.`;
+  if (negatives.length) impactLine += ` Tradeoff to monitor: ${negatives[0]}.`;
 
+  return `${base} (${label}, intensity ${Number(item?.intensity || 0).toFixed(1)}).${impactLine}`;
+}
+
+function summarizeRanking(sim) {
+  const metricKeys = Object.keys(sim?.baseline_metrics || {});
+  const sorted = metricKeys
+    .map(k => ({ key: k, delta: Number(sim?.deltas?.[k] || 0) }))
+    .sort((a, b) => b.delta - a.delta);
+
+  const topTwo = sorted.filter(r => r.delta > 0).slice(0, 2);
+  const worst = sorted[sorted.length - 1];
+
+  const gains = topTwo.length
+    ? topTwo.map(r => `${METRIC_META[r.key]?.title || r.key} (${formatDelta(r.delta)})`).join(', ')
+    : 'No strong gains yet';
+  const tradeoff = worst && worst.delta < 0
+    ? `${METRIC_META[worst.key]?.title || worst.key} (${formatDelta(worst.delta)})`
+    : 'No negative tradeoff detected';
+
+  return { gains, tradeoff };
+}
+
+function renderSimulation(sim, stale = false) {
+  if (!sim) {
+    renderPlaceholder();
+    return;
+  }
+
+  const baselineComp = compositeScore(sim.baseline_metrics);
+  const proposalComp = compositeScore(sim.proposal_metrics);
+  const net = proposalComp - baselineComp;
+
+  document.getElementById('timeline').innerHTML = `
+    <div class="timeline-card"><b>Baseline</b><span>${baselineComp.toFixed(1)}</span></div>
+    <div class="timeline-card"><b>Proposed</b><span>${proposalComp.toFixed(1)}</span></div>
+    <div class="timeline-card"><b>Net Impact</b><span class="${net >= 0 ? 'sim-pos' : 'sim-neg'}">${formatDelta(net)}</span></div>
+  `;
+
+  const interventionTypes = Object.keys(scenarioInterventions).length;
+  const interventionTotal = Object.values(scenarioInterventions).reduce((sum, n) => sum + Number(n || 0), 0);
+  document.getElementById('sim-meta').textContent = `Last updated ${formatUpdatedTime(sim.metadata?.generated_at)} • ${interventionTypes} intervention types • ${interventionTotal.toFixed(1)} total intensity${stale ? ' • showing cached results' : ''}`;
+
+  const confidenceMap = sim.metadata?.confidence || {};
+  const kpiWrap = document.getElementById('sim-kpis');
+  kpiWrap.innerHTML = '';
+
+  const metricKeys = Object.keys(sim.baseline_metrics || {});
+  for (const key of metricKeys) {
+    const base = Number(sim.baseline_metrics[key] || 0);
+    const next = Number(sim.proposal_metrics[key] || 0);
+    const delta = Number(sim.deltas[key] || 0);
+    const meta = METRIC_META[key] || { title: key, meaning: '' };
+    const conf = Number(confidenceMap[key] || 0);
+    const band = confidenceBand(conf);
+
+    const card = document.createElement('div');
+    card.className = 'sim-kpi';
+    card.innerHTML = `
+      <b>${meta.title}</b>
+      <span>${base.toFixed(1)} -> ${next.toFixed(1)} (${scoreBand(next)})</span>
+      <em class="${delta >= 0 ? 'sim-pos' : 'sim-neg'}">${formatDelta(delta)}</em>
+      <div class="kpi-badges">
+        <span class="badge ${band.cls}">${band.label}</span>
+      </div>
+      <details class="kpi-details">
+        <summary>Details</summary>
+        <div class="kpi-detail-text">${meta.meaning}</div>
+        <div class="kpi-detail-text">${metricReason(key, sim.intervention_summary)}</div>
+      </details>
+    `;
+    kpiWrap.appendChild(card);
+  }
+
+  const { gains, tradeoff } = summarizeRanking(sim);
+
+  const sourceHealth = sim.metadata?.source_health || { ok: 0, missing: 0, fallback: 0 };
+  document.getElementById('sim-ranking').innerHTML = `<b>Top improvements:</b> ${gains}<br><b>Main tradeoff:</b> ${tradeoff}<br><b>Data health:</b> ok ${sourceHealth.ok}, missing ${sourceHealth.missing}, fallback ${sourceHealth.fallback}`;
+
+  const whyList = document.getElementById('why-list');
+  whyList.innerHTML = '';
+  for (const item of (sim.intervention_summary || [])) {
+    const li = document.createElement('li');
+    li.textContent = describeInterventionEnglish(item);
+    whyList.appendChild(li);
+  }
+  if (!whyList.children.length) {
+    whyList.innerHTML = '<li>Baseline run: no interventions applied yet.</li>';
+  }
+}
+
+function applySimulationVisuals(sim) {
+  if (!simDeckOverlay || !sim || !map) return;
+
+  const zoom = map.getZoom();
+  const flows = [...(sim.flows || [])].sort((a, b) => b.weight - a.weight);
+  const zones = [...(sim.zones || [])].sort((a, b) => b.change - a.change);
+
+  const maxFlows = zoom < 11 ? 0 : zoom < 12 ? 8 : zoom < 13 ? 15 : 24;
+  const maxLabels = zoom < 12 ? 0 : zoom < 13 ? 5 : 10;
+
+  simDeckOverlay.setProps({
+    getTooltip: ({ object }) => {
+      if (!object || !object.name) return null;
+      return `${object.name}\nChange ${formatDelta(Number(object.change || 0))}`;
+    },
+    layers: [
+      new deck.ArcLayer({
+        id: 'sim-impact-flows',
+        data: flows.slice(0, maxFlows),
+        pickable: false,
+        getSourcePosition: d => d.source,
+        getTargetPosition: d => d.target,
+        getSourceColor: [120, 180, 255, 22],
+        getTargetColor: [255, 175, 110, 90],
+        getWidth: d => 0.8 + d.weight * 0.22
+      }),
+      new deck.TextLayer({
+        id: 'sim-impact-labels',
+        data: zones.slice(0, maxLabels),
+        pickable: true,
+        getPosition: d => d.position,
+        getText: d => d.name,
+        getColor: [255, 245, 230, 145],
+        getSize: zoom >= 14 ? 13 : 11,
+        sizeUnits: 'meters',
+        billboard: true,
+        getTextAnchor: 'middle',
+        getAlignmentBaseline: 'center'
+      })
+    ]
+  });
+}
+
+async function runSimulation() {
+  const runBtn = document.getElementById('sim-run');
+  const statusEl = document.getElementById('sim-status');
+  if (!cityCenter) return;
+
+  runBtn.disabled = true;
+  statusEl.textContent = 'Running simulation...';
+
+  const interventions = Object.entries(scenarioInterventions).map(([type, intensity]) => ({ type, intensity }));
+
+  try {
+    const resp = await fetch(`${SIM_API_BASE}/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        city: CITY,
+        latitude: cityCenter[1],
+        longitude: cityCenter[0],
+        interventions
+      })
+    });
+
+    if (!resp.ok) throw new Error(`simulation endpoint ${resp.status}`);
+>>>>>>> 3b39f8d (improved integration)
+
+    latestSimulation = await resp.json();
+    lastGoodSimulation = latestSimulation;
+
+<<<<<<< HEAD
     const data = await resp.json();
     const raw  = data.choices?.[0]?.message?.content?.trim();
     if (!raw) { appendMsg('assistant', 'No response from Groq.'); return; }
@@ -388,9 +1318,43 @@ async function callGroq(userText) {
     } else if (parsed.action === 'add') {
         appendMsg('assistant', `Got it — adding ${parsed.feature.replace(/_/g,' ')}…`);
         await executeAdd(parsed);
+=======
+    if (interventions.length === 0) {
+      scenarioSlots.baseline = {
+        savedAt: nowIso(),
+        interventions: {},
+        simulation: deepClone(latestSimulation)
+      };
+      persistScenarioSlots();
+>>>>>>> 3b39f8d (improved integration)
     }
+
+    renderSimulation(latestSimulation, false);
+    applySimulationVisuals(latestSimulation);
+    refreshCompareView();
+    updateScenarioButtonsLabel();
+
+    statusEl.textContent = `Simulation updated with ${interventions.length} intervention types.`;
+    setHealthBadge(true);
+  } catch (err) {
+    setHealthBadge(false);
+    const msg = err && err.message ? err.message : 'unknown error';
+    if (lastGoodSimulation) {
+      latestSimulation = lastGoodSimulation;
+      renderSimulation(lastGoodSimulation, true);
+      applySimulationVisuals(lastGoodSimulation);
+      statusEl.textContent = `Backend degraded (${msg}). Showing cached results.`;
+    } else {
+      renderPlaceholder();
+      statusEl.textContent = `Simulation unavailable (${msg}). Map editing still works.`;
+      if (simDeckOverlay) simDeckOverlay.setProps({ layers: [] });
+    }
+  } finally {
+    runBtn.disabled = false;
+  }
 }
 
+<<<<<<< HEAD
 function appendMsg(role, text, extraClass) {
     const msgs = document.getElementById('chat-messages');
     const div  = document.createElement('div');
@@ -405,11 +1369,356 @@ async function sendProposal(text) {
     appendMsg('user', text);
     document.getElementById('chat-send').disabled = true;
     try { await callGroq(text); } finally { document.getElementById('chat-send').disabled = false; }
+=======
+async function executeAdd(parsed, opts = {}) {
+  const { silent = false } = opts;
+  const f = parsed.feature;
+  const routeFeatures = ['bike_lane', 'bus_lane', 'pedestrian_street', 'flood_mitigation'];
+
+  if (routeFeatures.includes(f)) {
+    const [s, e] = await Promise.all([geocodePlace(parsed.start), geocodePlace(parsed.end)]);
+    if (!s || !e) {
+      appendMsg('assistant', "Couldn't locate one or both places — try being more specific.");
+      return;
+    }
+    const id = uid(f);
+    try {
+      if (f === 'bike_lane') {
+        await dynRoute(id, 'cycling', s, e, '#33cc55', -10, -6);
+        actionStack.push({ kind: 'feature', id, type: 'route', feature: f });
+      } else if (f === 'bus_lane') {
+        await dynRoute(id, 'driving', s, e, '#cc2200', 10, 6);
+        actionStack.push({ kind: 'feature', id, type: 'route', feature: f });
+      } else if (f === 'pedestrian_street') {
+        await dynPed(id, s, e);
+        actionStack.push({ kind: 'feature', id, type: 'ped', feature: f });
+      } else if (f === 'flood_mitigation') {
+        dynFlood(id, s, e);
+        actionStack.push({ kind: 'feature', id, type: 'flood', feature: f });
+      }
+    } catch {
+      appendMsg('assistant', "Couldn't draw the route — locations may be unreachable.");
+      return;
+    }
+    map.flyTo({ center: s, zoom: 15 });
+  } else {
+    const c = await geocodePlace(parsed.location);
+    if (!c) {
+      appendMsg('assistant', "Couldn't find that location — try a more specific address.");
+      return;
+    }
+    const id = uid(f);
+    if (f === 'bus_stop') {
+      dynPoint(id, nearbyCoords(c), '#003399', '#ffcc00', 11);
+      actionStack.push({ kind: 'feature', id, type: 'point', feature: f });
+    } else if (f === 'park') {
+      dynPark(id, c);
+      actionStack.push({ kind: 'feature', id, type: 'park', feature: f });
+    } else if (f === 'tree') {
+      dynPoint(id, c, '#2d8a2d', '#1a5e1a', 9);
+      actionStack.push({ kind: 'feature', id, type: 'point', feature: f });
+    } else if (f === 'solar_panel') {
+      dynPoint(id, c, '#FFD700', '#CC7700', 9);
+      actionStack.push({ kind: 'feature', id, type: 'point', feature: f });
+    }
+    map.flyTo({ center: c, zoom: 16 });
+  }
+
+  incrementInterventionForFeature(f, 1);
+  await runSimulation();
+  if (!silent) appendMsg('assistant', `Done — ${f.replace(/_/g, ' ')} added to the map.`);
+}
+
+async function undoLastAction() {
+  const statusEl = document.getElementById('sim-status');
+  const last = actionStack.pop();
+  if (!last) {
+    statusEl.textContent = 'Nothing to undo.';
+    return;
+  }
+
+  if (last.kind === 'state') {
+    scenarioInterventions = deepClone(last.prevInterventions || {});
+    clearMapArtifacts();
+    await runSimulation();
+    appendMsg('assistant', 'Undid last state change.');
+    return;
+  }
+
+  removeFeatureArtifact(last.id, last.type);
+  incrementInterventionForFeature(last.feature, -Number(last.amount || 1));
+  await runSimulation();
+  appendMsg('assistant', `Undid last ${last.feature.replace(/_/g, ' ')} action.`);
+}
+
+async function resetScenario() {
+  actionStack.push({ kind: 'state', prevInterventions: deepClone(scenarioInterventions) });
+  clearMapArtifacts();
+  scenarioInterventions = {};
+  await runSimulation();
+  appendMsg('assistant', 'Scenario reset to baseline.');
+}
+
+function saveScenario(slot) {
+  if (!latestSimulation) {
+    appendMsg('assistant', 'Run a simulation first before saving a scenario.');
+    return;
+  }
+  scenarioSlots[slot] = {
+    savedAt: nowIso(),
+    interventions: deepClone(scenarioInterventions),
+    simulation: deepClone(latestSimulation)
+  };
+  persistScenarioSlots();
+  refreshCompareView();
+  updateScenarioButtonsLabel();
+  appendMsg('assistant', `Saved current state to Scenario ${slot}.`);
+}
+
+async function loadScenario(slot) {
+  const saved = scenarioSlots[slot];
+  if (!saved) {
+    appendMsg('assistant', `Scenario ${slot} is empty.`);
+    return;
+  }
+  actionStack.push({ kind: 'state', prevInterventions: deepClone(scenarioInterventions) });
+  clearMapArtifacts();
+  scenarioInterventions = deepClone(saved.interventions || {});
+  await runSimulation();
+  appendMsg('assistant', `Loaded Scenario ${slot}.`);
+}
+
+async function applyBundle() {
+  const key = document.getElementById('bundle-select').value;
+  if (!key || !BUNDLES[key]) return;
+
+  actionStack.push({ kind: 'state', prevInterventions: deepClone(scenarioInterventions) });
+  clearMapArtifacts();
+  scenarioInterventions = deepClone(BUNDLES[key]);
+  await renderBundleVisuals();
+  await runSimulation();
+  appendMsg('assistant', `Applied ${key} policy bundle with visual map overlays.`);
+}
+
+async function exportPdfReport() {
+  if (!latestSimulation) {
+    appendMsg('assistant', 'No simulation to export yet.');
+    return;
+  }
+
+  try {
+    let mapImg = null;
+    try {
+      if (map) {
+        await new Promise(resolve => map.once('idle', resolve));
+        mapImg = map.getCanvas().toDataURL('image/jpeg', 0.88);
+      }
+    } catch {
+      mapImg = null;
+    }
+
+    if (!mapImg) {
+      const mapCanvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 1 });
+      mapImg = mapCanvas.toDataURL('image/jpeg', 0.88);
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+
+    const left = 28;
+    let y = 28;
+
+    doc.setFontSize(16);
+    doc.text(`City Digital Twin Report — ${CITY}`, left, y);
+    y += 16;
+
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, left, y);
+    y += 10;
+    doc.text(`Intervention types: ${Object.keys(scenarioInterventions).length}`, left, y);
+    y += 12;
+
+    doc.addImage(mapImg, 'JPEG', left, y, 360, 220);
+
+    const { gains, tradeoff } = summarizeRanking(latestSimulation);
+
+    let rX = 410;
+    let rY = 52;
+    const baseline = latestSimulation.baseline_metrics || {};
+    const proposed = latestSimulation.proposal_metrics || {};
+    const deltas = latestSimulation.deltas || {};
+
+    doc.setFontSize(12);
+    doc.text('Baseline vs Current', rX, rY);
+    rY += 14;
+    doc.setFontSize(10);
+
+    for (const key of Object.keys(METRIC_META)) {
+      const title = METRIC_META[key].title;
+      doc.text(`${title}: ${Number(baseline[key] || 0).toFixed(1)} -> ${Number(proposed[key] || 0).toFixed(1)} (${formatDelta(Number(deltas[key] || 0))})`, rX, rY);
+      rY += 12;
+    }
+
+    rY += 6;
+    doc.text('Scenario Compare (A/B):', rX, rY);
+    rY += 12;
+
+    const a = scenarioSlots.A?.simulation;
+    const b = scenarioSlots.B?.simulation;
+    if (!a || !b) {
+      doc.text('A/B not both saved yet.', rX, rY);
+      rY += 12;
+    } else {
+      const aComp = compositeScore(a.proposal_metrics || {});
+      const bComp = compositeScore(b.proposal_metrics || {});
+      doc.text(`Net Score A: ${aComp.toFixed(1)} | B: ${bComp.toFixed(1)}`, rX, rY);
+      rY += 12;
+      for (const key of Object.keys(METRIC_META)) {
+        const aD = Number(a.deltas?.[key] || 0);
+        const bD = Number(b.deltas?.[key] || 0);
+        doc.text(`${METRIC_META[key].title}: A ${formatDelta(aD)} vs B ${formatDelta(bD)}`, rX, rY);
+        rY += 12;
+      }
+    }
+
+    rY += 6;
+    const conf = latestSimulation.metadata?.confidence || {};
+    const fresh = latestSimulation.metadata?.freshness || {};
+    doc.text('Confidence / Freshness:', rX, rY);
+    rY += 12;
+    for (const key of Object.keys(METRIC_META)) {
+      doc.text(`${METRIC_META[key].title}: conf ${Number(conf[key] || 0).toFixed(1)} | ${fresh[key] || 'Unknown'}`, rX, rY);
+      rY += 12;
+    }
+
+    rY += 6;
+    doc.text(`Top gains: ${gains}`, rX, rY);
+    rY += 12;
+    doc.text(`Main tradeoff: ${tradeoff}`, rX, rY);
+
+    doc.save(`city_twin_${String(CITY).replace(/\s+/g, '_').toLowerCase()}_${Date.now()}.pdf`);
+    appendMsg('assistant', 'PDF report exported.');
+  } catch (err) {
+    appendMsg('assistant', `Export failed: ${err.message || 'unknown error'}`);
+  }
+}
+
+async function callParser(userText) {
+  const thinking = appendMsg('assistant', 'Thinking...', 'thinking');
+  const priorHistory = [...history];
+  history.push({ role: 'user', content: userText });
+
+  try {
+    const resp = await fetch(`${SIM_API_BASE}/llm/parse`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city: CITY, user_text: userText, history: priorHistory })
+    });
+
+    thinking.remove();
+
+    if (!resp.ok) {
+      appendMsg('assistant', `Parser error ${resp.status}.`);
+      return;
+    }
+
+    const parsed = await resp.json();
+    history.push({ role: 'assistant', content: JSON.stringify(parsed) });
+
+    if (parsed.action === 'clarify' || parsed.action === 'unknown') {
+      appendMsg('assistant', parsed.message || 'Could not parse request.');
+      return;
+    }
+
+    if (parsed.action === 'add') {
+      appendMsg('assistant', `Got it — adding ${String(parsed.feature || '').replace(/_/g, ' ')}...`);
+      await executeAdd(parsed);
+    }
+  } catch (err) {
+    thinking.remove();
+    appendMsg('assistant', `Parser unavailable (${err.message || 'unknown error'}).`);
+  }
+}
+
+async function sendProposal(text) {
+  appendMsg('user', text);
+  const sendBtn = document.getElementById('chat-send');
+  sendBtn.disabled = true;
+  try {
+    await callParser(text);
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+function setupMap(center) {
+  cityCenter = center;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/standard',
+    center,
+    zoom: 14,
+    pitch: 50,
+    bearing: 0,
+    preserveDrawingBuffer: true
+  });
+
+  map.on('load', async () => {
+    map.addSource('mapbox-dem', {
+      type: 'raster-dem',
+      url: 'mapbox://mapbox.terrain-rgb',
+      tileSize: 512,
+      maxzoom: 14
+    });
+    map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+
+    map.addLayer({
+      id: '3d-buildings',
+      source: 'composite',
+      'source-layer': 'building',
+      type: 'fill-extrusion',
+      paint: {
+        'fill-extrusion-color': ['interpolate', ['linear'], ['get', 'height'], 0, '#aaaaaa', 50, '#8899bb', 100, '#5577cc', 150, '#2244aa', 200, '#0a1a6e'],
+        'fill-extrusion-height': ['get', 'height'],
+        'fill-extrusion-base': ['get', 'min_height'],
+        'fill-extrusion-opacity': 0.9
+      }
+    });
+
+    simDeckOverlay = new deck.MapboxOverlay({ interleaved: true, layers: [] });
+    map.addControl(simDeckOverlay);
+
+    map.on('moveend', () => {
+      if (latestSimulation) applySimulationVisuals(latestSimulation);
+    });
+
+    loadScenarioSlots();
+    updateScenarioButtonsLabel();
+    refreshCompareView();
+    if (scenarioSlots.baseline?.simulation) {
+      latestSimulation = deepClone(scenarioSlots.baseline.simulation);
+      lastGoodSimulation = latestSimulation;
+      renderSimulation(latestSimulation, true);
+      applySimulationVisuals(latestSimulation);
+      document.getElementById('sim-status').textContent = 'Loaded cached baseline while connecting to backend...';
+    }
+
+    await checkBackendHealth();
+    await runSimulation();
+
+    if (PROPOSAL) {
+      appendMsg('assistant', `Welcome! I'll visualize your proposal for ${CITY}.`);
+      setTimeout(() => sendProposal(PROPOSAL), 350);
+    } else {
+      appendMsg('assistant', `Map loaded for ${CITY}. Describe an urban feature to add.`);
+    }
+  });
+>>>>>>> 3b39f8d (improved integration)
 }
 
 const sendBtn = document.getElementById('chat-send');
 const inputEl = document.getElementById('chat-input');
 
+<<<<<<< HEAD
 sendBtn.addEventListener('click', async () => {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -417,18 +1726,36 @@ sendBtn.addEventListener('click', async () => {
     inputEl.value = '';
     sendBtn.disabled = true;
     try { await callGroq(text); } finally { sendBtn.disabled = false; }
+=======
+sendBtn.addEventListener('click', () => {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  inputEl.value = '';
+  sendProposal(text);
+>>>>>>> 3b39f8d (improved integration)
 });
 
 inputEl.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    const text = inputEl.value.trim();
-    if (!text) return;
-    appendMsg('user', text);
-    inputEl.value = '';
-    sendBtn.disabled = true;
-    callGroq(text).finally(() => { sendBtn.disabled = false; });
+  if (e.key !== 'Enter') return;
+  const text = inputEl.value.trim();
+  if (!text) return;
+  inputEl.value = '';
+  sendProposal(text);
 });
 
+document.getElementById('sim-run').addEventListener('click', () => runSimulation());
+document.getElementById('sim-reset').addEventListener('click', () => resetScenario());
+document.getElementById('sim-undo').addEventListener('click', () => undoLastAction());
+document.getElementById('save-a').addEventListener('click', () => saveScenario('A'));
+document.getElementById('load-a').addEventListener('click', () => loadScenario('A'));
+document.getElementById('save-b').addEventListener('click', () => saveScenario('B'));
+document.getElementById('load-b').addEventListener('click', () => loadScenario('B'));
+document.getElementById('bundle-apply').addEventListener('click', () => applyBundle());
+document.getElementById('export-report').addEventListener('click', () => exportPdfReport());
+
+setInterval(checkBackendHealth, 20000);
+
+geocodeCity(CITY).then(setupMap);
 </script>
 
 </body>
