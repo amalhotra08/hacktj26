@@ -158,12 +158,31 @@
 
   .sim-body { padding: 10px 12px 12px; }
 
+  .panel-section {
+    margin-top: 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.11);
+    padding: 6px 8px;
+  }
+  .panel-section summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: rgba(255,255,255,0.92);
+    font-weight: 700;
+    list-style: none;
+  }
+  .panel-section summary::-webkit-details-marker { display: none; }
+  .panel-section summary::before { content: "▸ "; color: rgba(255,255,255,0.7); }
+  .panel-section[open] summary::before { content: "▾ "; }
+  .panel-section-body { margin-top: 8px; }
+
   .sim-controls,
   .scenario-controls,
   .bundle-controls {
     display: grid;
     gap: 6px;
-    margin-top: 6px;
+    margin-top: 0;
   }
   .sim-controls { grid-template-columns: repeat(3, 1fr); }
   .scenario-controls { grid-template-columns: repeat(4, 1fr); }
@@ -245,12 +264,12 @@
     color: rgba(255, 255, 255, 0.72);
   }
 
-  #sim-kpis { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  #sim-kpis { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
   .sim-kpi {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 7px;
-    padding: 6px;
+    padding: 7px;
   }
   .sim-kpi b { display: block; font-size: 10px; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: .5px; }
   .sim-kpi span { display: block; margin-top: 2px; font-size: 12px; color: #fff; }
@@ -335,72 +354,6 @@
       width: auto;
       max-height: 52vh;
     }
-<<<<<<< HEAD
-    #legend h4 { margin: 0 0 8px; font-size: 13px; color: #fff; letter-spacing:.5px; }
-
-    #chat-panel {
-        position: absolute; bottom: 24px; left: 12px;
-        width: 300px; max-height: 420px;
-        background: rgba(18,18,18,0.88);
-        color: #eee; font: 13px/1.5 sans-serif;
-        border-radius: 10px; z-index: 1;
-        display: flex; flex-direction: column;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    }
-    #chat-header {
-        padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.1);
-        display: flex; align-items: center; gap: 8px;
-    }
-    #chat-header b { flex: 1; font-size: 13px; }
-    #city-label {
-        font-size: 11px; color: rgba(255,255,255,0.45);
-        background: rgba(255,255,255,0.07);
-        border-radius: 4px; padding: 2px 7px;
-    }
-    #back-btn {
-        font-size: 11px; color: rgba(255,255,255,0.5);
-        background: none; border: none; cursor: pointer;
-        padding: 2px 6px; border-radius: 4px;
-        text-decoration: none;
-        transition: color .15s;
-    }
-    #back-btn:hover { color: #fff; }
-    #chat-messages {
-        flex: 1; overflow-y: auto; padding: 8px 10px;
-        display: flex; flex-direction: column; gap: 6px;
-        min-height: 70px; max-height: 260px;
-    }
-    .cm { max-width: 88%; padding: 5px 9px; border-radius: 8px; font-size: 12px; word-wrap: break-word; }
-    .cm.user      { background: #1a4a8a; align-self: flex-end; }
-    .cm.assistant { background: rgba(255,255,255,0.11); align-self: flex-start; }
-    .cm.thinking  { background: rgba(255,255,255,0.06); align-self: flex-start; color: rgba(255,255,255,0.4); font-style: italic; }
-    #chat-footer {
-        padding: 7px 10px; border-top: 1px solid rgba(255,255,255,0.1);
-        display: flex; gap: 6px;
-    }
-    #chat-input {
-        flex: 1; padding: 5px 8px;
-        background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 6px; color: #fff; font-size: 12px;
-    }
-    #chat-input::placeholder { color: rgba(255,255,255,0.35); }
-    #chat-send {
-        padding: 5px 11px; background: #1a4a8a; border: none;
-        border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer;
-    }
-    #chat-send:hover { background: #2255bb; }
-    #chat-send:disabled { opacity: 0.45; cursor: default; }
-
-    .legend-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
-    .swatch {
-        width: 22px; height: 14px; border-radius: 3px; flex-shrink: 0;
-        border: 1.5px solid rgba(255,255,255,0.25);
-    }
-    .swatch.circle { width: 14px; height: 14px; border-radius: 50%; }
-    .swatch.line   { height: 6px; border-radius: 2px; }
-    .swatch.stripe     { background: linear-gradient(to right, #444 40%, #33cc55 40%); }
-    .swatch.bus-stripe { background: linear-gradient(to right, #cc2200 30%, #444 30%); }
-=======
     #chat-panel {
       left: 8px;
       right: 8px;
@@ -412,7 +365,6 @@
     .scenario-controls { grid-template-columns: repeat(2, 1fr); }
     #compare-grid { grid-template-columns: 1fr; }
   }
->>>>>>> 3b39f8d (improved integration)
 </style>
 </head>
 <body>
@@ -431,26 +383,31 @@
       <button id="sim-undo" class="alt">Undo</button>
     </div>
 
-    <div class="scenario-controls">
-      <button id="save-a" class="alt">Save A</button>
-      <button id="load-a" class="alt">Load A</button>
-      <button id="save-b" class="alt">Save B</button>
-      <button id="load-b" class="alt">Load B</button>
-    </div>
+    <details id="advanced-controls" class="panel-section">
+      <summary>Advanced Controls</summary>
+      <div class="panel-section-body">
+        <div class="scenario-controls">
+          <button id="save-a" class="alt">Save A</button>
+          <button id="load-a" class="alt">Load A</button>
+          <button id="save-b" class="alt">Save B</button>
+          <button id="load-b" class="alt">Load B</button>
+        </div>
 
-    <div class="bundle-controls">
-      <select id="bundle-select">
-        <option value="">Select policy bundle...</option>
-        <option value="climate">Climate-first</option>
-        <option value="safety">Safety-first</option>
-        <option value="mobility">Mobility-first</option>
-      </select>
-      <button id="bundle-apply">Apply Bundle</button>
-    </div>
+        <div class="bundle-controls" style="margin-top:6px;">
+          <select id="bundle-select">
+            <option value="">Select policy bundle...</option>
+            <option value="climate">Climate-first</option>
+            <option value="safety">Safety-first</option>
+            <option value="mobility">Mobility-first</option>
+          </select>
+          <button id="bundle-apply">Apply Bundle</button>
+        </div>
 
-    <div class="bundle-controls">
-      <button id="export-report">Export Report (PDF)</button>
-    </div>
+        <div class="bundle-controls" style="margin-top:6px;">
+          <button id="export-report">Export Report (PDF)</button>
+        </div>
+      </div>
+    </details>
 
     <p id="sim-status">Waiting for map load...</p>
 
@@ -459,13 +416,18 @@
     <div id="sim-kpis"></div>
     <div id="sim-ranking"></div>
 
-    <div id="compare-grid">
-      <div class="compare-card"><b>Scenario A Net</b><span id="compare-a">-</span></div>
-      <div class="compare-card"><b>Scenario B Net</b><span id="compare-b">-</span></div>
-      <div class="compare-card"><b>Winner</b><span id="compare-winner">-</span></div>
-    </div>
-    <div id="compare-summary">Save Scenario A and B to compare outcomes.</div>
-    <div id="compare-metrics"></div>
+    <details id="compare-wrap" class="panel-section">
+      <summary>Scenario A/B Compare</summary>
+      <div class="panel-section-body">
+        <div id="compare-grid">
+          <div class="compare-card"><b>Scenario A Net</b><span id="compare-a">-</span></div>
+          <div class="compare-card"><b>Scenario B Net</b><span id="compare-b">-</span></div>
+          <div class="compare-card"><b>Winner</b><span id="compare-winner">-</span></div>
+        </div>
+        <div id="compare-summary">Save Scenario A and B to compare outcomes.</div>
+        <div id="compare-metrics"></div>
+      </div>
+    </details>
 
     <details id="why-wrap">
       <summary>Why this changed</summary>
@@ -475,34 +437,6 @@
 </div>
 
 <div id="chat-panel">
-<<<<<<< HEAD
-    <div id="chat-header">
-        <b>Map Assistant</b>
-        <span id="city-label"></span>
-        <a id="back-btn" href="home.html">&#8592; Back</a>
-    </div>
-    <div id="chat-messages"></div>
-    <div id="chat-footer">
-        <input id="chat-input" type="text" placeholder="Add a bike lane from … to …" />
-        <button id="chat-send">Send</button>
-    </div>
-</div>
-
-<div id="legend">
-    <h4>Map Key</h4>
-    <div class="legend-row"><div class="swatch stripe"></div><span>Bike Lane</span></div>
-    <div class="legend-row"><div class="swatch bus-stripe"></div><span>Bus Lane</span></div>
-    <div class="legend-row"><div class="swatch line" style="background:#c8b48a;border-color:#7a6a4a;"></div><span>Pedestrian Street</span></div>
-    <div class="legend-row"><div class="swatch" style="background:#3a9e44;"></div><span>Park</span></div>
-    <div class="legend-row"><div class="swatch circle" style="background:#2d8a2d;border-color:#1a5e1a;"></div><span>Trees</span></div>
-    <div class="legend-row"><div class="swatch" style="background:#1a8fbf;"></div><span>Flood Mitigation</span></div>
-    <div class="legend-row"><div class="swatch circle" style="background:#FFD700;border-color:#CC7700;"></div><span>Solar Panels</span></div>
-    <div class="legend-row"><div class="swatch" style="background:linear-gradient(to top,#aaa,#0a1a6e);"></div><span>Buildings (taller = darker)</span></div>
-</div>
-
-<script>
-
-=======
   <div id="chat-header">
     <b>Map Assistant</b>
     <span id="city-label"></span>
@@ -527,7 +461,6 @@
 </div>
 
 <script>
->>>>>>> 3b39f8d (improved integration)
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2Fuc3VicmExMyIsImEiOiJjbW1nb2g2bHgwaWduMnFwcmthNWNtZWpwIn0.YbKSy-h3T67-qFfsDnnszw';
 const SIM_API_BASE = 'http://localhost:8001';
 
@@ -816,58 +749,6 @@ function nearbyCoords(coords) {
   return [coords[0] + Math.cos(angle) * dist, coords[1] + Math.sin(angle) * dist];
 }
 
-<<<<<<< HEAD
-function dynRoute(id, profile, start, end, color, offset, divOffset) {
-    return fetch(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
-    .then(r => r.json()).then(d => {
-        if (!d.routes?.length) throw new Error('No route found');
-        const geom = d.routes[0].geometry;
-        map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:geom } });
-        map.addLayer({ id:`${id}-s`, type:'line', source:id, slot:'top',
-            layout:{'line-cap':'round','line-join':'round'},
-            paint:{'line-color':'#444','line-width':28} });
-        map.addLayer({ id:`${id}-l`, type:'line', source:id, slot:'top',
-            layout:{'line-cap':'butt','line-join':'round'},
-            paint:{'line-color':color,'line-width':7,'line-offset':offset} });
-        map.addLayer({ id:`${id}-d`, type:'line', source:id, slot:'top',
-            paint:{'line-color':'#fff','line-width':1.5,'line-offset':divOffset,'line-dasharray':[4,4]} });
-        map.addLayer({ id:`${id}-c`, type:'line', source:id, slot:'top',
-            paint:{'line-color':'#ffff00','line-width':1.5,'line-dasharray':[6,5]} });
-        map.addLayer({ id:`${id}-el`, type:'line', source:id, slot:'top',
-            paint:{'line-color':'#fff','line-width':1.5,'line-offset':13} });
-        map.addLayer({ id:`${id}-er`, type:'line', source:id, slot:'top',
-            paint:{'line-color':'#fff','line-width':1.5,'line-offset':-13} });
-    });
-}
-
-function dynPed(id, start, end) {
-    return fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
-    .then(r => r.json()).then(d => {
-        if (!d.routes?.length) throw new Error('No route found');
-        const geom = d.routes[0].geometry;
-        map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:geom } });
-        map.addLayer({ id:`${id}-s`, type:'line', source:id, slot:'top',
-            layout:{'line-cap':'round','line-join':'round'},
-            paint:{'line-color':'#c8b48a','line-width':20} });
-        map.addLayer({ id:`${id}-el`, type:'line', source:id, slot:'top',
-            paint:{'line-color':'#7a6a4a','line-width':2.5,'line-offset':9} });
-        map.addLayer({ id:`${id}-er`, type:'line', source:id, slot:'top',
-            paint:{'line-color':'#7a6a4a','line-width':2.5,'line-offset':-9} });
-    });
-}
-
-function dynFlood(id, start, end) {
-    const w = 0.0003;
-    map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:{ type:'Polygon', coordinates:[[
-        [start[0], start[1]+w], [end[0], end[1]+w],
-        [end[0],   end[1]-w],   [start[0], start[1]-w],
-        [start[0], start[1]+w]
-    ]]}}});
-    map.addLayer({ id:`${id}-f`, type:'fill', source:id, slot:'top',
-        paint:{'fill-color':'#1a8fbf','fill-opacity':0.70} });
-    map.addLayer({ id:`${id}-o`, type:'line', source:id, slot:'top',
-        paint:{'line-color':'#0a5a82','line-width':2} });
-=======
 function offsetLngLat(center, eastMeters, northMeters) {
   const [lng, lat] = center;
   const dLat = northMeters / 111320;
@@ -1001,7 +882,6 @@ function dynFlood(id, start, end) {
   ]]}}});
   map.addLayer({ id: `${id}-f`, type: 'fill', source: id, slot: 'top', paint: {'fill-color': '#1a8fbf', 'fill-opacity': 0.70} });
   map.addLayer({ id: `${id}-o`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#0a5a82', 'line-width': 2} });
->>>>>>> 3b39f8d (improved integration)
 }
 
 function dynPoint(id, coords, color, stroke, radius = 10) {
@@ -1020,42 +900,6 @@ function dynPark(id, center) {
   map.addLayer({ id: `${id}-o`, type: 'line', source: id, slot: 'top', paint: {'line-color': '#1e6b25', 'line-width': 2.5} });
 }
 
-<<<<<<< HEAD
-async function executeAdd(parsed) {
-    const f = parsed.feature;
-    const routeFeatures = ['bike_lane','bus_lane','pedestrian_street','flood_mitigation'];
-
-    if (routeFeatures.includes(f)) {
-        const [s, e] = await Promise.all([geocodePlace(parsed.start), geocodePlace(parsed.end)]);
-        if (!s || !e) { appendMsg('assistant', "Couldn't locate one or both places — try being more specific."); return; }
-        const id = uid(f);
-        try {
-            if      (f === 'bike_lane')         await dynRoute(id, 'cycling', s, e, '#33cc55', -10, -6);
-            else if (f === 'bus_lane')          await dynRoute(id, 'driving', s, e, '#cc2200',  10,  6);
-            else if (f === 'pedestrian_street') await dynPed(id, s, e);
-            else if (f === 'flood_mitigation')  dynFlood(id, s, e);
-        } catch {
-            appendMsg('assistant', "Couldn't draw the route — the locations may be unreachable. Try different endpoints.");
-            return;
-        }
-        map.flyTo({ center: s, zoom: 15 });
-    } else {
-        const c = await geocodePlace(parsed.location);
-        if (!c) { appendMsg('assistant', "Couldn't find that location — try a more specific address."); return; }
-        const id = uid(f);
-        if      (f === 'bus_stop')    dynPoint(id, nearbyCoords(c), '#003399', '#ffcc00', 11);
-        else if (f === 'park')        dynPark(id, c);
-        else if (f === 'tree')        dynPoint(id, c, '#2d8a2d', '#1a5e1a', 9);
-        else if (f === 'solar_panel') dynPoint(id, c, '#FFD700', '#CC7700', 9);
-        map.flyTo({ center: c, zoom: 16 });
-    }
-    appendMsg('assistant', `Done — ${f.replace(/_/g,' ')} added to the map.`);
-}
-
-const SYSTEM_PROMPT = `
-You are an urban infrastructure map assistant for ${CITY}.
-Parse user requests to add features to a map. Always respond with valid JSON only — no other text.
-=======
 function incrementInterventionForFeature(feature, amount = 1) {
   const k = FEATURE_TO_INTERVENTION[feature];
   if (!k) return;
@@ -1072,7 +916,6 @@ function appendMsg(role, text, extraClass) {
   msgs.scrollTop = msgs.scrollHeight;
   return div;
 }
->>>>>>> 3b39f8d (improved integration)
 
 function renderPlaceholder() {
   document.getElementById('timeline').innerHTML = `
@@ -1116,24 +959,6 @@ function describeInterventionEnglish(item) {
     .map(([k, v]) => ({ key: k, val: Number(v || 0) }))
     .sort((a, b) => Math.abs(b.val) - Math.abs(a.val));
 
-<<<<<<< HEAD
-    const thinking = appendMsg('assistant', 'Thinking…', 'thinking');
-
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [{ role:'system', content: SYSTEM_PROMPT }, ...history],
-            response_format: { type: 'json_object' }
-        })
-    });
-
-    thinking.remove();
-=======
   const positives = ranked.filter(r => r.val > 0).slice(0, 2).map(r => METRIC_META[r.key]?.title || r.key);
   const negatives = ranked.filter(r => r.val < 0).slice(0, 1).map(r => METRIC_META[r.key]?.title || r.key);
 
@@ -1297,28 +1122,10 @@ async function runSimulation() {
     });
 
     if (!resp.ok) throw new Error(`simulation endpoint ${resp.status}`);
->>>>>>> 3b39f8d (improved integration)
 
     latestSimulation = await resp.json();
     lastGoodSimulation = latestSimulation;
 
-<<<<<<< HEAD
-    const data = await resp.json();
-    const raw  = data.choices?.[0]?.message?.content?.trim();
-    if (!raw) { appendMsg('assistant', 'No response from Groq.'); return; }
-
-    history.push({ role: 'assistant', content: raw });
-
-    let parsed;
-    try { parsed = JSON.parse(raw); }
-    catch { appendMsg('assistant', "Couldn't parse response — try rephrasing."); return; }
-
-    if (parsed.action === 'clarify' || parsed.action === 'unknown') {
-        appendMsg('assistant', parsed.message);
-    } else if (parsed.action === 'add') {
-        appendMsg('assistant', `Got it — adding ${parsed.feature.replace(/_/g,' ')}…`);
-        await executeAdd(parsed);
-=======
     if (interventions.length === 0) {
       scenarioSlots.baseline = {
         savedAt: nowIso(),
@@ -1326,7 +1133,6 @@ async function runSimulation() {
         simulation: deepClone(latestSimulation)
       };
       persistScenarioSlots();
->>>>>>> 3b39f8d (improved integration)
     }
 
     renderSimulation(latestSimulation, false);
@@ -1354,22 +1160,6 @@ async function runSimulation() {
   }
 }
 
-<<<<<<< HEAD
-function appendMsg(role, text, extraClass) {
-    const msgs = document.getElementById('chat-messages');
-    const div  = document.createElement('div');
-    div.className = `cm ${role}${extraClass ? ' ' + extraClass : ''}`;
-    div.textContent = text;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-    return div;
-}
-
-async function sendProposal(text) {
-    appendMsg('user', text);
-    document.getElementById('chat-send').disabled = true;
-    try { await callGroq(text); } finally { document.getElementById('chat-send').disabled = false; }
-=======
 async function executeAdd(parsed, opts = {}) {
   const { silent = false } = opts;
   const f = parsed.feature;
@@ -1712,27 +1502,16 @@ function setupMap(center) {
       appendMsg('assistant', `Map loaded for ${CITY}. Describe an urban feature to add.`);
     }
   });
->>>>>>> 3b39f8d (improved integration)
 }
 
 const sendBtn = document.getElementById('chat-send');
 const inputEl = document.getElementById('chat-input');
 
-<<<<<<< HEAD
-sendBtn.addEventListener('click', async () => {
-    const text = inputEl.value.trim();
-    if (!text) return;
-    appendMsg('user', text);
-    inputEl.value = '';
-    sendBtn.disabled = true;
-    try { await callGroq(text); } finally { sendBtn.disabled = false; }
-=======
 sendBtn.addEventListener('click', () => {
   const text = inputEl.value.trim();
   if (!text) return;
   inputEl.value = '';
   sendProposal(text);
->>>>>>> 3b39f8d (improved integration)
 });
 
 inputEl.addEventListener('keydown', e => {
