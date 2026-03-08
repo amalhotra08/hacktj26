@@ -39,14 +39,14 @@ def get_land_use_data(latitude, longitude, radius_meters=1000):
             else:
                 land_use_counts[use_type] = 1
                 
-        print("--- Local Land Use Zoning (OSM) ---")
-        print("-" * 35)
+        # print("--- Local Land Use Zoning (OSM) ---")
+        # print("-" * 35)
         
-        for use_type, count in sorted(land_use_counts.items(), key=lambda x: x[1], reverse=True):
-            formatted_type = use_type.replace('_', ' ').title()
-            print(f"{formatted_type:<15}: {count} parcels/zones")
+        # for use_type, count in sorted(land_use_counts.items(), key=lambda x: x[1], reverse=True):
+        #     formatted_type = use_type.replace('_', ' ').title()
+        #     print(f"{formatted_type:<15}: {count} parcels/zones")
             
-        print("-" * 35)
+        # print("-" * 35)
         return land_use_counts
 
     except requests.exceptions.RequestException as e:
@@ -59,7 +59,7 @@ def get_us_demographics(latitude, longitude):
     and median income data from the American Community Survey (ACS).
     """
     try:
-        print("\nFetching US Census Demographic Data...")
+        # print("\nFetching US Census Demographic Data...")
         
         # Step 1: Get the Census FIPS code using the FCC Geocoder API
         fcc_url = f"https://geo.fcc.gov/api/census/block/find?latitude={latitude}&longitude={longitude}&format=json"
@@ -100,13 +100,13 @@ def get_us_demographics(latitude, longitude):
             # Format income cleanly
             formatted_income = f"${int(income):,}" if income is not None and int(income) > 0 else "Data Unavailable"
             formatted_pop = f"{int(population):,}" if population is not None else "Unknown"
-            
-            print("--- Neighborhood Demographics ---")
-            print("-" * 40)
-            print(f"Area:           {name}")
-            print(f"Population:     {formatted_pop} people")
-            print(f"Median Income:  {formatted_income}")
-            print("-" * 40)
+
+            # print("--- Neighborhood Demographics ---")
+            # print("-" * 40)
+            # print(f"Area:           {name}")
+            # print(f"Population:     {formatted_pop} people")
+            # print(f"Median Income:  {formatted_income}")
+            # print("-" * 40)
             
             return {"population": population, "median_income": income}
         else:

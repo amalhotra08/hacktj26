@@ -18,7 +18,7 @@ def get_air_quality_data(latitude, longitude):
     }
     
     try:
-        print(f"Fetching air quality data for Lat: {latitude}, Lon: {longitude}...\n")
+        # print(f"Fetching air quality data for Lat: {latitude}, Lon: {longitude}...\n")
         response = requests.get(url, params=params)
         response.raise_for_status() # Check for HTTP errors
         
@@ -42,15 +42,15 @@ def get_air_quality_data(latitude, longitude):
         date_obj = datetime.strptime(time_str, "%Y-%m-%dT%H:%M")
         formatted_time = date_obj.strftime("%b %d, %Y at %I:%M %p")
         
-        print(f"--- Current Air Quality as of {formatted_time} ---")
-        print("-" * 55)
-        print(f"US AQI:           {aqi} (Lower is better)")
-        print(f"PM2.5:            {pm25} μg/m³ (Fine particulate matter)")
-        print(f"PM10:             {pm10} μg/m³ (Coarse particulate matter)")
-        print(f"Ozone (O3):       {ozone} μg/m³")
-        print(f"Carbon Monoxide:  {co} μg/m³")
-        print(f"Nitrogen Dioxide: {no2} μg/m³")
-        print("-" * 55)
+        # print(f"--- Current Air Quality as of {formatted_time} ---")
+        # print("-" * 55)
+        # print(f"US AQI:           {aqi} (Lower is better)")
+        # print(f"PM2.5:            {pm25} μg/m³ (Fine particulate matter)")
+        # print(f"PM10:             {pm10} μg/m³ (Coarse particulate matter)")
+        # print(f"Ozone (O3):       {ozone} μg/m³")
+        # print(f"Carbon Monoxide:  {co} μg/m³")
+        # print(f"Nitrogen Dioxide: {no2} μg/m³")
+        # print("-" * 55)
         
         return current_data
 

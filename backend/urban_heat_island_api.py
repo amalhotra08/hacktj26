@@ -38,9 +38,9 @@ def get_uhi_estimate(urban_lat, urban_lon):
     }
     
     try:
-        print(f"Fetching Urban vs Rural temperatures...")
-        print(f"Urban Core:    Lat {urban_lat}, Lon {urban_lon}")
-        print(f"Rural Offset:  Lat {rural_lat}, Lon {rural_lon} (~25km NW)\n")
+        # print(f"Fetching Urban vs Rural temperatures...")
+        # print(f"Urban Core:    Lat {urban_lat}, Lon {urban_lon}")
+        # print(f"Rural Offset:  Lat {rural_lat}, Lon {rural_lon} (~25km NW)\n")
         
         response = requests.get(url, params=params)
         response.raise_for_status()
@@ -61,25 +61,25 @@ def get_uhi_estimate(urban_lat, urban_lon):
         temp_delta = urban_temp - rural_temp
         feels_delta = urban_feels - rural_feels
         
-        print("--- Real-Time Urban Heat Island (UHI) Estimate ---")
-        print("-" * 50)
-        print(f"Target (Urban) Temp:    {urban_temp:.1f}°F (Feels like {urban_feels:.1f}°F)")
-        print(f"Baseline (Rural) Temp:  {rural_temp:.1f}°F (Feels like {rural_feels:.1f}°F)")
-        print("-" * 50)
+        # print("--- Real-Time Urban Heat Island (UHI) Estimate ---")
+        # print("-" * 50)
+        # print(f"Target (Urban) Temp:    {urban_temp:.1f}°F (Feels like {urban_feels:.1f}°F)")
+        # print(f"Baseline (Rural) Temp:  {rural_temp:.1f}°F (Feels like {rural_feels:.1f}°F)")
+        # print("-" * 50)
         
-        if temp_delta > 0:
-            print(f"🔥 UHI Effect Detected: The urban core is +{temp_delta:.1f}°F hotter.")
-            if temp_delta > 3:
-                print("   Status: Severe Heat Island Intensity.")
-            elif temp_delta > 1:
-                print("   Status: Moderate Heat Island Intensity.")
-        elif temp_delta < 0:
-            print(f"🌳 Cool Island Effect: The target area is actually {abs(temp_delta):.1f}°F cooler.")
-            print("   (This happens if the target is a large park, near water, or if the rural offset hit a mountain/desert).")
-        else:
-            print("⚖️ No temperature difference detected right now.")
+        # if temp_delta > 0:
+        #     print(f"🔥 UHI Effect Detected: The urban core is +{temp_delta:.1f}°F hotter.")
+        #     if temp_delta > 3:
+        #         print("   Status: Severe Heat Island Intensity.")
+        #     elif temp_delta > 1:
+        #         print("   Status: Moderate Heat Island Intensity.")
+        # elif temp_delta < 0:
+        #     print(f"🌳 Cool Island Effect: The target area is actually {abs(temp_delta):.1f}°F cooler.")
+        #     print("   (This happens if the target is a large park, near water, or if the rural offset hit a mountain/desert).")
+        # else:
+        #     print("⚖️ No temperature difference detected right now.")
             
-        print("-" * 50)
+        # print("-" * 50)
         
         return {
             "urban_temp": urban_temp,

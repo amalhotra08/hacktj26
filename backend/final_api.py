@@ -11,6 +11,30 @@ from tree_coverage_api import get_tree_coverage
 from urban_heat_island_api import get_uhi_estimate     
 from weather_api import get_weather_data
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+import math
+
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(env_path)
+
+def calculate_bounding_box(lat, lon, radius_km=1):
+    """
+    Takes a center latitude/longitude and draws a bounding box around it.
+    Returns: min_lat, min_lon, max_lat, max_lon
+    """
+    # 1 degree of latitude is ~111 km
+    lat_offset = radius_km / 111.0
+    
+    # 1 degree of longitude varies by latitude
+    lon_offset = radius_km / (111.0 * math.cos(math.radians(lat)))
+    
+    min_lat = lat - lat_offset
+    max_lat = lat + lat_offset
+    min_lon = lon - lon_offset
+    max_lon = lon + lon_offset
+    
+    return min_lat, min_lon, max_lat, max_lon
 
 class LocationIntelligenceAnalyzer:
     def __init__(self, tomtom_api_key=None):
@@ -36,10 +60,12 @@ class LocationIntelligenceAnalyzer:
             "data": {}
         }
         
+# Calculate the bounding box for APIs that require an area instead of a point
+        min_lat, min_lon, max_lat, max_lon = calculate_bounding_box(latitude, longitude, radius_km=1)
+
         # Use ThreadPoolExecutor to run all requests at the exact same time
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             
-            # Map our specific tasks and their arguments
             future_to_api = {
                 executor.submit(get_air_quality_data, latitude, longitude): 'air_quality',
                 executor.submit(get_us_demographics, latitude, longitude): 'census',
@@ -47,7 +73,11 @@ class LocationIntelligenceAnalyzer:
                 executor.submit(get_environmental_risk, latitude, longitude): 'environmental_risks',
                 executor.submit(get_flood_risk_data, latitude, longitude): 'flood_risk',
                 executor.submit(get_traffic_data, latitude, longitude, self.tomtom_api_key): 'traffic',
-                executor.submit(get_tree_coverage, latitude, longitude): 'tree_coverage',
+                
+                # --- THE FIX IS HERE ---
+                # Check your tree_coverage.py file to ensure the parameter order matches this:
+                executor.submit(get_tree_coverage, min_lat, min_lon, max_lat, max_lon): 'tree_coverage', 
+                
                 executor.submit(get_uhi_estimate, latitude, longitude): 'urban_heat_island',
                 executor.submit(get_weather_data, latitude, longitude): 'weather'
             }

@@ -19,7 +19,7 @@ def get_flood_risk_data(latitude, longitude):
     }
     
     try:
-        print(f"Fetching flood risk data for Lat: {latitude}, Lon: {longitude}...\n")
+        # print(f"Fetching flood risk data for Lat: {latitude}, Lon: {longitude}...\n")
         response = requests.get(url, params=params)
         response.raise_for_status() # Check for HTTP errors
         
@@ -34,9 +34,9 @@ def get_flood_risk_data(latitude, longitude):
             print("No water system data available for these coordinates.")
             return None
             
-        print("--- River Discharge Forecast ---")
-        print("Unit: Cubic meters per second (m³/s)")
-        print("-" * 32)
+        # print("--- River Discharge Forecast ---")
+        # print("Unit: Cubic meters per second (m³/s)")
+        # print("-" * 32)
         
         # Loop through and print the paired dates and values
         results = []
@@ -51,7 +51,7 @@ def get_flood_risk_data(latitude, longitude):
             else:
                 discharge_val = f"{discharge:.2f}"
                 
-            print(f"{formatted_date}: {discharge_val} m³/s")
+            # print(f"{formatted_date}: {discharge_val} m³/s")
             
             results.append({"date": date_str, "discharge_m3_s": discharge})
             

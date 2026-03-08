@@ -20,7 +20,7 @@ def get_environmental_risk(latitude, longitude):
     }
     
     try:
-        print(f"Fetching FEMA Environmental Risk data for Lat: {latitude}, Lon: {longitude}...\n")
+        # print(f"Fetching FEMA Environmental Risk data for Lat: {latitude}, Lon: {longitude}...\n")
         response = requests.get(url, params=params)
         response.raise_for_status()
         
@@ -39,9 +39,9 @@ def get_environmental_risk(latitude, longitude):
         state = attributes.get("STATE", "Unknown")
         overall_risk = attributes.get("RISK_RATNG", "Unknown")
         
-        print(f"--- Environmental Risk Report: {county} County, {state} ---")
-        print(f"Overall National Risk Index:  {overall_risk}")
-        print("-" * 55)
+        # print(f"--- Environmental Risk Report: {county} County, {state} ---")
+        # print(f"Overall National Risk Index:  {overall_risk}")
+        # print("-" * 55)
         
         # FEMA uses specific 4-letter abbreviations for their hazard ratings
         hazards = {
@@ -56,13 +56,9 @@ def get_environmental_risk(latitude, longitude):
             "Winter Weather": attributes.get("WNTW_RATNG", "Data Unavailable"),
             "Heat Wave": attributes.get("HWAV_RATNG", "Data Unavailable")
         }
-        
-        for hazard, rating in hazards.items():
-            # Ratings are returned as qualitative strings (e.g., 'Very Low', 'Relatively High')
-            print(f"{hazard:<30}: {rating}")
-            
-        print("-" * 55)
-        return attributes
+
+        # print("-" * 55)
+        return hazards
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching environmental risk data: {e}")

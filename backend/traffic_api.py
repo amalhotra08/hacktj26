@@ -16,7 +16,7 @@ def get_traffic_data(latitude, longitude, api_key):
     }
     
     try:
-        print(f"Fetching traffic data for Lat: {latitude}, Lon: {longitude}...\n")
+        # print(f"Fetching traffic data for Lat: {latitude}, Lon: {longitude}...\n")
         response = requests.get(url, params=params)
         
         # If the API key is invalid or missing, catch it early
@@ -50,12 +50,12 @@ def get_traffic_data(latitude, longitude, api_key):
         else:
             status = "⚪ Unknown"
 
-        print("--- Live Traffic Flow ---")
-        print("-" * 35)
-        print(f"Current Speed:    {current_speed} mph")
-        print(f"Free Flow Speed:  {free_flow_speed} mph (Normal speed limit without traffic)")
-        print(f"Status:           {status}")
-        print("-" * 35)
+        # print("--- Live Traffic Flow ---")
+        # print("-" * 35)
+        # print(f"Current Speed:    {current_speed} mph")
+        # print(f"Free Flow Speed:  {free_flow_speed} mph (Normal speed limit without traffic)")
+        # print(f"Status:           {status}")
+        # print("-" * 35)
         
         return flow_data
 

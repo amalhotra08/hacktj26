@@ -26,9 +26,16 @@
     }
     #legend h4 { margin: 0 0 8px; font-size: 13px; color: #fff; letter-spacing:.5px; }
 
+<<<<<<< HEAD
     #chat-panel {
         position: absolute; bottom: 24px; left: 12px;
         width: 300px; max-height: 420px;
+=======
+    /* ── Chat panel ── */
+    #chat-panel {
+        position: absolute; bottom: 24px; left: 12px;
+        width: 300px; max-height: 400px;
+>>>>>>> 7885c2b (working final api)
         background: rgba(18,18,18,0.88);
         color: #eee; font: 13px/1.5 sans-serif;
         border-radius: 10px; z-index: 1;
@@ -40,6 +47,7 @@
         display: flex; align-items: center; gap: 8px;
     }
     #chat-header b { flex: 1; font-size: 13px; }
+<<<<<<< HEAD
     #city-label {
         font-size: 11px; color: rgba(255,255,255,0.45);
         background: rgba(255,255,255,0.07);
@@ -57,11 +65,20 @@
         flex: 1; overflow-y: auto; padding: 8px 10px;
         display: flex; flex-direction: column; gap: 6px;
         min-height: 70px; max-height: 260px;
+=======
+    #chat-messages {
+        flex: 1; overflow-y: auto; padding: 8px 10px;
+        display: flex; flex-direction: column; gap: 6px;
+        min-height: 70px; max-height: 240px;
+>>>>>>> 7885c2b (working final api)
     }
     .cm { max-width: 88%; padding: 5px 9px; border-radius: 8px; font-size: 12px; word-wrap: break-word; }
     .cm.user      { background: #1a4a8a; align-self: flex-end; }
     .cm.assistant { background: rgba(255,255,255,0.11); align-self: flex-start; }
+<<<<<<< HEAD
     .cm.thinking  { background: rgba(255,255,255,0.06); align-self: flex-start; color: rgba(255,255,255,0.4); font-style: italic; }
+=======
+>>>>>>> 7885c2b (working final api)
     #chat-footer {
         padding: 7px 10px; border-top: 1px solid rgba(255,255,255,0.1);
         display: flex; gap: 6px;
@@ -78,16 +95,32 @@
     }
     #chat-send:hover { background: #2255bb; }
     #chat-send:disabled { opacity: 0.45; cursor: default; }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7885c2b (working final api)
     .legend-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
     .swatch {
         width: 22px; height: 14px; border-radius: 3px; flex-shrink: 0;
         border: 1.5px solid rgba(255,255,255,0.25);
     }
+<<<<<<< HEAD
     .swatch.circle { width: 14px; height: 14px; border-radius: 50%; }
     .swatch.line   { height: 6px; border-radius: 2px; }
     .swatch.stripe     { background: linear-gradient(to right, #444 40%, #33cc55 40%); }
     .swatch.bus-stripe { background: linear-gradient(to right, #cc2200 30%, #444 30%); }
+=======
+    .swatch.circle {
+        width: 14px; height: 14px; border-radius: 50%;
+    }
+    .swatch.line { height: 6px; border-radius: 2px; }
+    .swatch.stripe {
+        background: linear-gradient(to right, #444 40%, #33cc55 40%);
+    }
+    .swatch.bus-stripe {
+        background: linear-gradient(to right, #cc2200 30%, #444 30%);
+    }
+>>>>>>> 7885c2b (working final api)
 </style>
 </head>
 
@@ -98,12 +131,21 @@
 <div id="chat-panel">
     <div id="chat-header">
         <b>Map Assistant</b>
+<<<<<<< HEAD
         <span id="city-label"></span>
         <a id="back-btn" href="home.html">&#8592; Back</a>
     </div>
     <div id="chat-messages"></div>
     <div id="chat-footer">
         <input id="chat-input" type="text" placeholder="Add a bike lane from … to …" />
+=======
+    </div>
+    <div id="chat-messages">
+        <div class="cm assistant">Try: "add a bike lane from Dupont Circle to Union Station" or "add a bus stop at Adams Morgan"</div>
+    </div>
+    <div id="chat-footer">
+        <input id="chat-input" type="text" placeholder="Add a bus lane from … to …" />
+>>>>>>> 7885c2b (working final api)
         <button id="chat-send">Send</button>
     </div>
 </div>
@@ -117,11 +159,16 @@
     <div class="legend-row"><div class="swatch circle" style="background:#2d8a2d;border-color:#1a5e1a;"></div><span>Trees</span></div>
     <div class="legend-row"><div class="swatch" style="background:#1a8fbf;"></div><span>Flood Mitigation</span></div>
     <div class="legend-row"><div class="swatch circle" style="background:#FFD700;border-color:#CC7700;"></div><span>Solar Panels</span></div>
+<<<<<<< HEAD
     <div class="legend-row"><div class="swatch" style="background:linear-gradient(to top,#aaa,#0a1a6e);"></div><span>Buildings (taller = darker)</span></div>
+=======
+    <div class="legend-row"><div class="swatch" style="background:linear-gradient(to top,#aaa,#0a1a6e);"></div><span>Skyscrapers (taller = darker blue)</span></div>
+>>>>>>> 7885c2b (working final api)
 </div>
 
 <script>
 
+<<<<<<< HEAD
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2Fuc3VicmExMyIsImEiOiJjbW1nb2g2bHgwaWduMnFwcmthNWNtZWpwIn0.YbKSy-h3T67-qFfsDnnszw';
 const GROQ_API_KEY = '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';
 
@@ -228,6 +275,260 @@ function dynRoute(id, profile, start, end, color, offset, divOffset) {
     return fetch(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
     .then(r => r.json()).then(d => {
         if (!d.routes?.length) throw new Error('No route found');
+=======
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2Fuc3VicmExMyIsImEiOiJjbW1nb2g2bHgwaWduMnFwcmthNWNtZWpwIn0.YbKSy-h3T67-qFfsDnnszw';
+
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/standard',
+    center: [-77.0300, 38.8975],
+    zoom: 15,
+    pitch: 45,
+    bearing: 0
+});
+
+map.on('load', () => {
+
+    map.addSource('mapbox-dem', {
+        type: 'raster-dem',
+        url: 'mapbox://mapbox.terrain-rgb',
+        tileSize: 512,
+        maxzoom: 14
+    });
+
+    map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+
+    const parkPolygons = {
+        type: 'FeatureCollection',
+        features: [
+            { type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+                [-77.0414,38.9006],[-77.0394,38.9006],
+                [-77.0394,38.9018],[-77.0414,38.9018],[-77.0414,38.9006]
+            ]]}},
+            { type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+                [-77.0349,38.9010],[-77.0329,38.9010],
+                [-77.0329,38.9024],[-77.0349,38.9024],[-77.0349,38.9010]
+            ]]}},
+            { type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+                [-77.0305,38.8993],[-77.0285,38.8993],
+                [-77.0285,38.9007],[-77.0305,38.9007],[-77.0305,38.8993]
+            ]]}}
+        ]
+    };
+
+    map.addLayer({
+        id: '3d-buildings',
+        source: 'composite',
+        'source-layer': 'building',
+        type: 'fill-extrusion',
+        filter: ['!', ['within', parkPolygons]],
+        paint: {
+            'fill-extrusion-color': [
+                'interpolate', ['linear'], ['get', 'height'],
+                0,   '#aaaaaa',
+                50,  '#8899bb',
+                100, '#5577cc',
+                150, '#2244aa',
+                200, '#0a1a6e'
+            ],
+            'fill-extrusion-height': ['get', 'height'],
+            'fill-extrusion-base': ['get', 'min_height'],
+            'fill-extrusion-opacity': 0.9
+        }
+    });
+
+    map.addSource('parks', { type: 'geojson', data: parkPolygons });
+
+    map.addLayer({ id: 'park-fill',    type: 'fill', source: 'parks', slot: 'top',
+        paint: { 'fill-color': '#3a9e44', 'fill-opacity': 0.45 } });
+    map.addLayer({ id: 'park-outline', type: 'line', source: 'parks', slot: 'top',
+        paint: { 'line-color': '#1e6b25', 'line-width': 2.5 } });
+
+    map.addSource('trees', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: [
+                [-77.0410,38.9010], [-77.0398,38.9010],
+                [-77.0410,38.9014], [-77.0398,38.9014],
+                [-77.0345,38.9014], [-77.0333,38.9014],
+                [-77.0345,38.9020], [-77.0333,38.9020],
+                [-77.0301,38.8997], [-77.0289,38.8997],
+                [-77.0301,38.9003], [-77.0289,38.9003],
+                [-77.0470,38.8985], [-77.0440,38.8985], [-77.0410,38.8985],
+                [-77.0380,38.8985], [-77.0350,38.8985], [-77.0320,38.8985],
+                [-77.0290,38.8985], [-77.0260,38.8985], [-77.0230,38.8985],
+                [-77.0200,38.8985], [-77.0170,38.8985], [-77.0140,38.8985],
+                [-77.0470,38.8925], [-77.0440,38.8925], [-77.0410,38.8925],
+                [-77.0380,38.8925], [-77.0350,38.8925], [-77.0320,38.8925],
+                [-77.0290,38.8925], [-77.0260,38.8925], [-77.0230,38.8925],
+                [-77.0200,38.8925], [-77.0170,38.8925], [-77.0140,38.8925]
+            ].map(coord => ({
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: coord }
+            }))
+        }
+    });
+
+    map.addLayer({ id: 'trees', type: 'circle', source: 'trees', slot: 'top',
+        paint: {
+            'circle-radius': 7,
+            'circle-color': '#2d8a2d',
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#1a5e1a'
+        }
+    });
+
+    map.addSource('flood', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: [
+                { type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+                    [-77.0490,38.8992],[-77.0110,38.8992],
+                    [-77.0110,38.8988],[-77.0490,38.8988],
+                    [-77.0490,38.8992]
+                ]]}},
+                { type:'Feature', geometry:{ type:'Polygon', coordinates:[[
+                    [-77.0490,38.8922],[-77.0110,38.8922],
+                    [-77.0110,38.8918],[-77.0490,38.8918],
+                    [-77.0490,38.8922]
+                ]]}}
+            ]
+        }
+    });
+
+    map.addLayer({ id: 'flood-fill',    type: 'fill', source: 'flood', slot: 'top',
+        paint: { 'fill-color': '#1a8fbf', 'fill-opacity': 0.70 } });
+    map.addLayer({ id: 'flood-outline', type: 'line', source: 'flood', slot: 'top',
+        paint: { 'line-color': '#0a5a82', 'line-width': 2 } });
+
+    map.addSource('solar', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: [
+                [-77.0478,38.8993], [-77.0455,38.8996], [-77.0432,38.8991],
+                [-77.0375,38.8994], [-77.0358,38.8992],
+                [-77.0318,38.8995], [-77.0270,38.8993],
+                [-77.0248,38.8996], [-77.0225,38.8992],
+                [-77.0200,38.8995], [-77.0175,38.8993], [-77.0148,38.8996]
+            ].map(coord => ({
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: coord }
+            }))
+        }
+    });
+
+    map.addLayer({ id: 'solar-panels', type: 'circle', source: 'solar', slot: 'top',
+        paint: {
+            'circle-radius': 8,
+            'circle-color': '#FFD700',
+            'circle-stroke-width': 2.5,
+            'circle-stroke-color': '#CC7700'
+        }
+    });
+
+    window._addRoad = function addRoad(id, profile, start, end, laneColor, laneOffset, dividerOffset) {
+        fetch(
+            `https://api.mapbox.com/directions/v5/mapbox/${profile}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`
+        )
+        .then(r => r.json())
+        .then(data => {
+            const geom = data.routes[0].geometry;
+            map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:geom } });
+
+            map.addLayer({ id:`${id}-surface`, type:'line', source:id, slot:'top',
+                layout:{ 'line-cap':'round','line-join':'round' },
+                paint:{ 'line-color':'#444444','line-width':28 } });
+            map.addLayer({ id:`${id}-lane`, type:'line', source:id, slot:'top',
+                layout:{ 'line-cap':'butt','line-join':'round' },
+                paint:{ 'line-color':laneColor,'line-width':7,'line-offset':laneOffset } });
+            map.addLayer({ id:`${id}-divider`, type:'line', source:id, slot:'top',
+                layout:{ 'line-cap':'butt' },
+                paint:{ 'line-color':'#ffffff','line-width':1.5,
+                        'line-offset':dividerOffset,'line-dasharray':[4,4] } });
+            map.addLayer({ id:`${id}-centre`, type:'line', source:id, slot:'top',
+                layout:{ 'line-cap':'butt' },
+                paint:{ 'line-color':'#ffff00','line-width':1.5,'line-dasharray':[6,5] } });
+            map.addLayer({ id:`${id}-edge-l`, type:'line', source:id, slot:'top',
+                paint:{ 'line-color':'#ffffff','line-width':1.5,'line-offset':13 } });
+            map.addLayer({ id:`${id}-edge-r`, type:'line', source:id, slot:'top',
+                paint:{ 'line-color':'#ffffff','line-width':1.5,'line-offset':-13 } });
+        });
+    }
+
+    window._addRoad('bike', 'cycling', [-77.0500,38.8975], [-77.0100,38.8975], '#33cc55', -10, -6);
+
+    window._addRoad('bus',  'driving', [-77.0500,38.9015], [-77.0100,38.9015], '#cc2200',  10,  6);
+
+    fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/walking/-77.0500,38.8935;-77.0100,38.8935?geometries=geojson&access_token=${mapboxgl.accessToken}`
+    )
+    .then(r => r.json())
+    .then(data => {
+        const geom = data.routes[0].geometry;
+        map.addSource('ped', { type:'geojson', data:{ type:'Feature', geometry:geom } });
+
+        map.addLayer({ id:'ped-surface', type:'line', source:'ped', slot:'top',
+            layout:{ 'line-cap':'round','line-join':'round' },
+            paint:{ 'line-color':'#c8b48a','line-width':20 } });
+        map.addLayer({ id:'ped-edge-l', type:'line', source:'ped', slot:'top',
+            paint:{ 'line-color':'#7a6a4a','line-width':2.5,'line-offset':9 } });
+        map.addLayer({ id:'ped-edge-r', type:'line', source:'ped', slot:'top',
+            paint:{ 'line-color':'#7a6a4a','line-width':2.5,'line-offset':-9 } });
+        map.addLayer({ id:'ped-dashes', type:'line', source:'ped', slot:'top',
+            paint:{ 'line-color':'#a09060','line-width':1.5,'line-dasharray':[2,7] } });
+    });
+
+});
+
+</script>
+
+<script>
+const GROQ_API_KEY = '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';
+
+const SYSTEM_PROMPT = `
+You are a Washington DC urban infrastructure map assistant.
+Parse user requests to add features to a map. Always respond with valid JSON only — no other text.
+
+Supported features:
+  Route features (need "start" AND "end" DC locations):
+    bike_lane, bus_lane, pedestrian_street, flood_mitigation
+  Point/area features (need a single "location" in DC):
+    bus_stop, park, tree, solar_panel
+
+Response formats:
+  If all info present and it is a route feature:
+    {"action":"add","feature":"<type>","start":"<location>","end":"<location>"}
+  If all info present and it is a point feature:
+    {"action":"add","feature":"<type>","location":"<location>"}
+  If required location info is missing:
+    {"action":"clarify","message":"<question asking specifically what is missing>"}
+  If request is unclear or unsupported:
+    {"action":"unknown","message":"<brief helpful response>"}
+
+Always be specific in clarify messages about exactly what is missing.
+`.trim();
+
+let history = [];
+let dynCount = 0;
+function uid(p) { return `${p}-dyn-${++dynCount}`; }
+
+async function geocodeDC(place) {
+    const q = encodeURIComponent(place + ' Washington DC');
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json`
+              + `?proximity=-77.03,38.90&bbox=-77.12,38.79,-76.91,38.99&country=US`
+              + `&access_token=${mapboxgl.accessToken}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    return d.features.length ? d.features[0].center : null;
+}
+
+function dynRoute(id, profile, start, end, color, offset, divOffset) {
+    fetch(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`)
+    .then(r => r.json()).then(d => {
+>>>>>>> 7885c2b (working final api)
         const geom = d.routes[0].geometry;
         map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:geom } });
         map.addLayer({ id:`${id}-s`, type:'line', source:id, slot:'top',
@@ -248,9 +549,14 @@ function dynRoute(id, profile, start, end, color, offset, divOffset) {
 }
 
 function dynPed(id, start, end) {
+<<<<<<< HEAD
     return fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${MAPBOX_TOKEN}`)
     .then(r => r.json()).then(d => {
         if (!d.routes?.length) throw new Error('No route found');
+=======
+    fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`)
+    .then(r => r.json()).then(d => {
+>>>>>>> 7885c2b (working final api)
         const geom = d.routes[0].geometry;
         map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:geom } });
         map.addLayer({ id:`${id}-s`, type:'line', source:id, slot:'top',
@@ -267,7 +573,11 @@ function dynFlood(id, start, end) {
     const w = 0.0003;
     map.addSource(id, { type:'geojson', data:{ type:'Feature', geometry:{ type:'Polygon', coordinates:[[
         [start[0], start[1]+w], [end[0], end[1]+w],
+<<<<<<< HEAD
         [end[0],   end[1]-w],   [start[0], start[1]-w],
+=======
+        [end[0], end[1]-w],   [start[0], start[1]-w],
+>>>>>>> 7885c2b (working final api)
         [start[0], start[1]+w]
     ]]}}});
     map.addLayer({ id:`${id}-f`, type:'fill', source:id, slot:'top',
@@ -300,6 +610,7 @@ async function executeAdd(parsed) {
     const routeFeatures = ['bike_lane','bus_lane','pedestrian_street','flood_mitigation'];
 
     if (routeFeatures.includes(f)) {
+<<<<<<< HEAD
         const [s, e] = await Promise.all([geocodePlace(parsed.start), geocodePlace(parsed.end)]);
         if (!s || !e) { appendMsg('assistant', "Couldn't locate one or both places — try being more specific."); return; }
         const id = uid(f);
@@ -318,6 +629,21 @@ async function executeAdd(parsed) {
         if (!c) { appendMsg('assistant', "Couldn't find that location — try a more specific address."); return; }
         const id = uid(f);
         if      (f === 'bus_stop')    dynPoint(id, nearbyCoords(c), '#003399', '#ffcc00', 11);
+=======
+        const [s, e] = await Promise.all([geocodeDC(parsed.start), geocodeDC(parsed.end)]);
+        if (!s || !e) { appendMsg('assistant', "Couldn't locate one or both places — try being more specific."); return; }
+        const id = uid(f);
+        if      (f === 'bike_lane')          dynRoute(id, 'cycling', s, e, '#33cc55', -10, -6);
+        else if (f === 'bus_lane')           dynRoute(id, 'driving', s, e, '#cc2200',  10,  6);
+        else if (f === 'pedestrian_street')  dynPed(id, s, e);
+        else if (f === 'flood_mitigation')   dynFlood(id, s, e);
+        map.flyTo({ center: s, zoom: 15 });
+    } else {
+        const c = await geocodeDC(parsed.location);
+        if (!c) { appendMsg('assistant', "Couldn't find that location — try a more specific DC address."); return; }
+        const id = uid(f);
+        if      (f === 'bus_stop')    dynPoint(id, c, '#003399', '#ffcc00', 11);
+>>>>>>> 7885c2b (working final api)
         else if (f === 'park')        dynPark(id, c);
         else if (f === 'tree')        dynPoint(id, c, '#2d8a2d', '#1a5e1a', 9);
         else if (f === 'solar_panel') dynPoint(id, c, '#FFD700', '#CC7700', 9);
@@ -326,6 +652,7 @@ async function executeAdd(parsed) {
     appendMsg('assistant', `Done — ${f.replace(/_/g,' ')} added to the map.`);
 }
 
+<<<<<<< HEAD
 const SYSTEM_PROMPT = `
 You are an urban infrastructure map assistant for ${CITY}.
 Parse user requests to add features to a map. Always respond with valid JSON only — no other text.
@@ -355,6 +682,17 @@ async function callGroq(userText) {
     history.push({ role: 'user', content: userText });
 
     const thinking = appendMsg('assistant', 'Thinking…', 'thinking');
+=======
+async function callGroq(userText) {
+    if (!GROQ_API_KEY) { appendMsg('assistant', 'Set GROQ_API_KEY in index.html first.'); return; }
+
+    history.push({ role: 'user', content: userText });
+
+    const messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...history
+    ];
+>>>>>>> 7885c2b (working final api)
 
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -364,24 +702,39 @@ async function callGroq(userText) {
         },
         body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
+<<<<<<< HEAD
             messages: [{ role:'system', content: SYSTEM_PROMPT }, ...history],
+=======
+            messages,
+>>>>>>> 7885c2b (working final api)
             response_format: { type: 'json_object' }
         })
     });
 
+<<<<<<< HEAD
     thinking.remove();
 
     if (!resp.ok) { appendMsg('assistant', `Groq error ${resp.status} — check API key.`); return; }
 
     const data = await resp.json();
     const raw  = data.choices?.[0]?.message?.content?.trim();
+=======
+    if (!resp.ok) { appendMsg('assistant', `Groq error: ${resp.status} — check your API key.`); return; }
+
+    const data = await resp.json();
+    const raw = data.choices?.[0]?.message?.content?.trim();
+>>>>>>> 7885c2b (working final api)
     if (!raw) { appendMsg('assistant', 'No response from Groq.'); return; }
 
     history.push({ role: 'assistant', content: raw });
 
     let parsed;
     try { parsed = JSON.parse(raw); }
+<<<<<<< HEAD
     catch { appendMsg('assistant', "Couldn't parse response — try rephrasing."); return; }
+=======
+    catch { appendMsg('assistant', "Couldn't parse Groq's response — try rephrasing."); return; }
+>>>>>>> 7885c2b (working final api)
 
     if (parsed.action === 'clarify' || parsed.action === 'unknown') {
         appendMsg('assistant', parsed.message);
@@ -391,6 +744,7 @@ async function callGroq(userText) {
     }
 }
 
+<<<<<<< HEAD
 function appendMsg(role, text, extraClass) {
     const msgs = document.getElementById('chat-messages');
     const div  = document.createElement('div');
@@ -405,18 +759,32 @@ async function sendProposal(text) {
     appendMsg('user', text);
     document.getElementById('chat-send').disabled = true;
     try { await callGroq(text); } finally { document.getElementById('chat-send').disabled = false; }
+=======
+function appendMsg(role, text) {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = `cm ${role}`;
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+>>>>>>> 7885c2b (working final api)
 }
 
 const sendBtn = document.getElementById('chat-send');
 const inputEl = document.getElementById('chat-input');
 
+<<<<<<< HEAD
 sendBtn.addEventListener('click', async () => {
+=======
+async function handleSend() {
+>>>>>>> 7885c2b (working final api)
     const text = inputEl.value.trim();
     if (!text) return;
     appendMsg('user', text);
     inputEl.value = '';
     sendBtn.disabled = true;
     try { await callGroq(text); } finally { sendBtn.disabled = false; }
+<<<<<<< HEAD
 });
 
 inputEl.addEventListener('keydown', e => {
@@ -433,3 +801,13 @@ inputEl.addEventListener('keydown', e => {
 
 </body>
 </html>
+=======
+}
+
+sendBtn.addEventListener('click', handleSend);
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+</script>
+
+</body>
+</html>
+>>>>>>> 7885c2b (working final api)

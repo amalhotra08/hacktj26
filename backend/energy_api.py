@@ -22,7 +22,7 @@ def get_energy_infrastructure(latitude, longitude, radius_meters=5000):
     """
     
     try:
-        print(f"Scanning for energy infrastructure within {radius_meters}m of Lat: {latitude}, Lon: {longitude}...\n")
+        # print(f"Scanning for energy infrastructure within {radius_meters}m of Lat: {latitude}, Lon: {longitude}...\n")
         response = requests.post(url, data={'data': query})
         response.raise_for_status()
         
@@ -46,17 +46,16 @@ def get_energy_infrastructure(latitude, longitude, radius_meters=5000):
             else:
                 infrastructure_counts[power_type] = 1
                 
-        print("--- Local Energy Infrastructure Found ---")
-        print("-" * 39)
-        
-        # Print the tallied results cleanly
-        for infra_type, count in sorted(infrastructure_counts.items()):
-            # Capitalize and format nicely
-            formatted_type = infra_type.replace('_', ' ').title()
-            print(f"{formatted_type:<20}: {count}")
+        # print("--- Local Energy Infrastructure Found ---")
+        # print("-" * 39)
+
+        # for infra_type, count in sorted(infrastructure_counts.items()):
+        #     # Capitalize and format nicely
+        #     formatted_type = infra_type.replace('_', ' ').title()
+        #     print(f"{formatted_type:<20}: {count}")
             
-        print("-" * 39)
-        print(f"Total features mapped: {len(elements)}")
+        # print("-" * 39)
+        # print(f"Total features mapped: {len(elements)}")
         
         return infrastructure_counts
 
